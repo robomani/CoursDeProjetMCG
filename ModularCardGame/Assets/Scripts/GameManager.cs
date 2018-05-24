@@ -17,11 +17,12 @@ public class GameManager : MonoBehaviour
     {
         if (m_TilePrefab && m_AltarPrefab)
         {
+            
             GameObject[] tileTemp = new GameObject[m_TilesAlongAltars * m_TilesBetweenAltars];
             Vector3 nextPosition = transform.position;
             m_Altars[0] = Instantiate(m_AltarPrefab, nextPosition, transform.rotation, transform) as GameObject;
-            m_Altars[0].transform.localScale = new Vector3(2.5f * m_TilesAlongAltars, 1f,2f);
-            nextPosition.x = transform.position.x - m_TilesAlongAltars;
+            m_Altars[0].transform.localScale = new Vector3((1.5f + m_DivideBetweenTiles )* (m_TilesAlongAltars + 2) - m_DivideBetweenTiles, 1f,2f);
+            nextPosition.x = transform.position.x - ((m_TilesAlongAltars * 1.5f)/2 - m_DivideBetweenTiles/2);
             nextPosition.z = transform.position.z + 2f + m_DivideBetweenTiles;
             for (int i = 0; i < m_TilesAlongAltars; i++)
             {
@@ -30,14 +31,14 @@ public class GameManager : MonoBehaviour
                     tileTemp[i * m_TilesBetweenAltars + j] = Instantiate(m_TilePrefab, nextPosition, transform.rotation, transform) as GameObject;
                     nextPosition.z += 2f + m_DivideBetweenTiles;
                 }
-                nextPosition.x += m_TilesAlongAltars;
+                nextPosition.x += (1.5f + m_DivideBetweenTiles);
                 nextPosition.z = transform.position.z + 2f + m_DivideBetweenTiles;
             }
             m_Tiles = tileTemp;
-            nextPosition.z += 2f * (m_TilesBetweenAltars + 1) + m_DivideBetweenTiles;
+            nextPosition.z += (2f * (m_TilesBetweenAltars + 1)) + m_DivideBetweenTiles;
             nextPosition.x = transform.position.x;
             m_Altars[1] = Instantiate(m_AltarPrefab, nextPosition, transform.rotation, transform) as GameObject;
-            m_Altars[1].transform.localScale = new Vector3(2.5f * m_TilesAlongAltars, 1f, 2f);
+            m_Altars[1].transform.localScale = new Vector3((1.5f + m_DivideBetweenTiles) * (m_TilesAlongAltars + 2) - m_DivideBetweenTiles, 1f, 2f);
         }
 	}
 	
