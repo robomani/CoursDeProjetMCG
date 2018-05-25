@@ -1471,7 +1471,7 @@ MonoBehaviour:
   m_PlayerDeck: {fileID: 1987800165}
   m_PlayerHand: {fileID: 696374997}
   m_PlayerGrave: {fileID: 45801987}
-  m_RandomDeckSize: 50
+  m_RandomDeckSize: 10
   m_RandomDeck: 0
   m_Hand: []
   m_Deck: []
@@ -2973,7 +2973,7 @@ GameObject:
   - component: {fileID: 1135032809}
   - component: {fileID: 1135032808}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: GameBoardManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
