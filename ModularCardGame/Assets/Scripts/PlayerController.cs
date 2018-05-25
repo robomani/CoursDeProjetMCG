@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
 
     private int m_Mana = 1;
     private int m_MaxMana = 1;
+    public Card[] m_Hand;
+    public Card[] m_Deck;
+    public Card[] m_Grave;
 
 
     public void Cast(int i_ManaCost)
@@ -22,5 +25,15 @@ public class PlayerController : MonoBehaviour
             m_Mana = 0;
             m_MaxMana++;
         }
+    }
+
+    public void DrawCard()
+    {
+
+    }
+
+    public void DiscardCard()
+    {
+
     }
 }
