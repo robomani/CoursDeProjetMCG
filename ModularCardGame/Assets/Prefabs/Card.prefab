@@ -123,3 +123,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dfa81e3418966d4b9648156e4acb4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_CardName: Soldat
