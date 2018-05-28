@@ -5,9 +5,11 @@ using UnityEngine;
 public class Card : MonoBehaviour
 {
     public string m_CardName;
+    public int m_Position;
 
-    public Card(string i_Name)
+    public Card(string i_Name, int i_Position)
     {
         m_CardName = i_Name;
+        m_Position = i_Position;
     }
 }

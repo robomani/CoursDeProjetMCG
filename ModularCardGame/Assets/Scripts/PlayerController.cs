@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private int m_MaxMana = 1;
     [SerializeField]
-    private int m_NBRSolder = 10;
+    private int m_NBRSoldat = 10;
     [SerializeField]
     private int m_NBRMage = 5;
     [SerializeField]
@@ -39,11 +39,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject m_CardPrefab;
     [SerializeField]
-    private Transform m_PlayerDeck;
+    private Transform m_PlayerDeckPosition;
     [SerializeField]
-    private Transform m_PlayerHand;
+    private Transform m_PlayerHandPosition;
     [SerializeField]
-    private Transform m_PlayerGrave;
+    private Transform m_PlayerGravePosition;
 
     [SerializeField]
     private int m_RandomDeckSize = 65;
@@ -53,9 +53,9 @@ public class PlayerController : MonoBehaviour
     private int m_Mana = 1;
 
 
-    public Card[] m_Hand;
+    public GameObject[] m_Hand;
     public GameObject[] m_Deck;
-    public Card[] m_Grave;
+    public GameObject[] m_Grave;
 
 
     private void Start()
@@ -66,9 +66,22 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            GenerateDeck(m_NBRSolder + m_NBRMage + m_NBRArbaletrier + m_NBRSort + m_NBRForge + m_NBRMur + m_NBRTour + m_NBRHp + m_NBRAttaque + m_NBRMouvement + m_NBRPousse + m_NBREchange + m_NBRArmure + m_NBROmbre);
-        }          
+            GenerateDeck(m_NBRSoldat + m_NBRMage + m_NBRArbaletrier + m_NBRSort + m_NBRForge + m_NBRMur + m_NBRTour + m_NBRHp + m_NBRAttaque + m_NBRMouvement + m_NBRPousse + m_NBREchange + m_NBRArmure + m_NBROmbre);
+        }  
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            DrawCard();
+        }
+        else if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            DiscardCard(0);
+        }
+    }
+
 
     public void Cast(int i_ManaCost)
     {
@@ -86,159 +99,103 @@ public class PlayerController : MonoBehaviour
 
     public void DrawCard()
     {
-
+        int i = 0;
+        while (m_Deck[i] == null)
+        {
+            i++;
+        }
+        m_Hand[System.Array.IndexOf(m_Hand, null)] = m_Deck[i];
+        m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
+        m_Deck[i] = null;
     }
 
-    public void DiscardCard()
+    public void DiscardCard(int i_CardNumber)
+    {
+        if (m_Hand[i_CardNumber].GetComponent<Card>())
+        {
+            m_Grave[System.Array.IndexOf(m_Grave, null)] = m_Hand[i_CardNumber];
+            m_Hand[i_CardNumber].transform.Translate(m_PlayerGravePosition.position);
+            m_Hand[i_CardNumber] = null;
+        }
+        
+    }
+
+    public GameObject AddCardToDeck( string i_Type,ref int r_Counter, int i_Position)
     {
 
+        GameObject deckTemp = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeckPosition);
+        deckTemp.GetComponent<Card>().m_CardName = i_Type;
+        deckTemp.GetComponent<Card>().m_Position = i_Position;
+        deckTemp.name = i_Type;
+        if (!m_RandomDeck)
+        {
+            r_Counter--;
+        }
+        return deckTemp;
     }
 
     public void GenerateDeck(int i_DeckSize = 65)
     {
         GameObject[] tempDeck = new GameObject[i_DeckSize];
+        m_Grave = new GameObject[i_DeckSize];
         for (int i = 0; i < tempDeck.Length; i++)
         {
             float randTemp = Random.Range(0, 14);
-            if (randTemp == 0 && m_NBRSolder > 0)
+            if (randTemp == 0 && m_NBRSoldat > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Soldat";
-                tempDeck[i].name = "Soldat";
-                if (!m_RandomDeck)
-                {
-                    m_NBRSolder--;
-                }                
+                tempDeck[i] = AddCardToDeck("Soldat",ref m_NBRSoldat, i);
             }
             else if (randTemp == 1 && m_NBRMage > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Mage";
-                tempDeck[i].name = "Mage";
-                if (!m_RandomDeck)
-                {
-                    m_NBRMage--;
-                }
+                tempDeck[i] = AddCardToDeck("Mage", ref m_NBRMage, i);
             }
             else if (randTemp == 2 && m_NBRArbaletrier > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Arbaletrier";
-                tempDeck[i].name = "Arbaletrier";
-                if (!m_RandomDeck)
-                {
-                    m_NBRArbaletrier--;
-                }
+                tempDeck[i] = AddCardToDeck("Arbaletrier", ref m_NBRArbaletrier, i);
             }
             else if (randTemp == 3 && m_NBRSort > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Sort";
-                tempDeck[i].name = "Sort";
-                if (!m_RandomDeck)
-                {
-                    m_NBRSort--;
-                }
+                tempDeck[i] = AddCardToDeck("Sort", ref m_NBRSort, i);
             }
             else if (randTemp == 4 && m_NBRForge > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Forge";
-                tempDeck[i].name = "Forge";
-                if (!m_RandomDeck)
-                {
-                    m_NBRForge--;
-                }
+                tempDeck[i] = AddCardToDeck("Forge", ref m_NBRForge, i);
             }
             else if (randTemp == 5 && m_NBRMur > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Mur";
-                tempDeck[i].name = "Mur";
-                if (!m_RandomDeck)
-                {
-                    m_NBRMur--;
-                }
+                tempDeck[i] = AddCardToDeck("Mur", ref m_NBRMur, i);
             }
             else if (randTemp == 6 && m_NBRTour > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Tour";
-                tempDeck[i].name = "Tour";
-                if (!m_RandomDeck)
-                {
-                    m_NBRTour--;
-                }
+                tempDeck[i] = AddCardToDeck("Tour", ref m_NBRTour, i);
             }
             else if (randTemp == 7 && m_NBRHp > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Hp";
-                tempDeck[i].name = "Hp";
-                if (!m_RandomDeck)
-                {
-                    m_NBRHp--;
-                }
+                tempDeck[i] = AddCardToDeck("Hp", ref m_NBRHp, i);
             }
             else if (randTemp == 8 && m_NBRAttaque > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Attaque";
-                tempDeck[i].name = "Attaque";
-                if (!m_RandomDeck)
-                {
-                    m_NBRAttaque--;
-                }
+                tempDeck[i] = AddCardToDeck("Attaque", ref m_NBRAttaque, i);
             }
             else if (randTemp == 9 && m_NBRMouvement > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Mouvement";
-                tempDeck[i].name = "Mouvement";
-                if (!m_RandomDeck)
-                {
-                    m_NBRMouvement--;
-                }
+                tempDeck[i] = AddCardToDeck("Mouvement", ref m_NBRMouvement, i);
             }
             else if (randTemp == 10 && m_NBRPousse > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Pousse";
-                tempDeck[i].name = "Pousse";
-                if (!m_RandomDeck)
-                {
-                    m_NBRPousse--;
-                }
+                tempDeck[i] = AddCardToDeck("Pousse", ref m_NBRPousse, i);
             }
             else if (randTemp == 11 && m_NBREchange > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Echange";
-                tempDeck[i].name = "Echange";
-                if (!m_RandomDeck)
-                {
-                    m_NBREchange--;
-                }
+                tempDeck[i] = AddCardToDeck("Echange", ref m_NBREchange, i);
             }
             else if (randTemp == 12 && m_NBRArmure > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Armure";
-                tempDeck[i].name = "Armure";
-                if (!m_RandomDeck)
-                {
-                    m_NBRArmure--;
-                }
+                tempDeck[i] = AddCardToDeck("Armure", ref m_NBRArmure, i);
             }
             else if (randTemp == 13 && m_NBROmbre > 0)
             {
-                tempDeck[i] = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeck);
-                tempDeck[i].GetComponent<Card>().m_CardName = "Ombre";
-                tempDeck[i].name = "Ombre";
-                if (!m_RandomDeck)
-                {
-                    m_NBROmbre--;
-                }
+                tempDeck[i] = AddCardToDeck("Ombre", ref m_NBROmbre, i);
             }
             else
             {
