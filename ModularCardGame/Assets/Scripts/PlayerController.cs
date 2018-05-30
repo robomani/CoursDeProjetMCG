@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+#region Variables
+
+
     [SerializeField]
     private int m_HP = 20;
     [SerializeField]
@@ -49,14 +52,21 @@ public class PlayerController : MonoBehaviour
     private int m_RandomDeckSize = 65;
     [SerializeField]
     private bool m_RandomDeck = false;
-
-    private int m_Mana = 1;
+    [SerializeField]
+    private int m_MaxHandSize = 7;
 
 
     public GameObject[] m_Hand;
     public GameObject[] m_Deck;
     public GameObject[] m_Grave;
 
+    private bool m_PlayerTurn = true;
+    private int m_Mana = 1;
+    private int m_SelectedCardIndex;
+    private Ray m_RayPlayerHand;
+    private Card m_LastCard = new Card("",-1);
+
+#endregion
 
     private void Start()
     {
@@ -80,8 +90,31 @@ public class PlayerController : MonoBehaviour
         {
             DiscardCard(0);
         }
-    }
 
+        m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit HitInfo;
+        if (m_PlayerTurn)
+        {
+            Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
+            if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
+            {
+                if (m_LastCard.m_CardName != "" && m_LastCard.m_Position != HitInfo.transform.GetComponent<Card>().m_Position)
+                {
+                    m_LastCard.UnIlluminate();
+                }
+                Debug.Log(HitInfo.transform.name);
+                m_SelectedCardIndex = HitInfo.transform.GetComponent<Card>().m_Position;
+                HitInfo.transform.GetComponent<Card>().Illuminate();
+                m_LastCard = HitInfo.transform.GetComponent<Card>();
+
+            }
+            else
+            {
+                m_LastCard.UnIlluminate();
+                m_LastCard.m_CardName = "";
+            }
+        }
+    }
 
     public void Cast(int i_ManaCost)
     {
@@ -99,14 +132,22 @@ public class PlayerController : MonoBehaviour
 
     public void DrawCard()
     {
-        int i = 0;
-        while (m_Deck[i] == null)
+        if (System.Array.IndexOf(m_Hand, null) > -1)
         {
-            i++;
+            int i = 0;
+            while (m_Deck[i] == null)
+            {
+                i++;
+            }
+            m_Hand[System.Array.IndexOf(m_Hand, null)] = m_Deck[i];
+            m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
+            m_Deck[i] = null;
         }
-        m_Hand[System.Array.IndexOf(m_Hand, null)] = m_Deck[i];
-        m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
-        m_Deck[i] = null;
+        else
+        {
+            Debug.Log("Main pleine");
+        }
+        
     }
 
     public void DiscardCard(int i_CardNumber)
@@ -116,8 +157,7 @@ public class PlayerController : MonoBehaviour
             m_Grave[System.Array.IndexOf(m_Grave, null)] = m_Hand[i_CardNumber];
             m_Hand[i_CardNumber].transform.Translate(m_PlayerGravePosition.position);
             m_Hand[i_CardNumber] = null;
-        }
-        
+        }   
     }
 
     public GameObject AddCardToDeck( string i_Type,ref int r_Counter, int i_Position)
@@ -138,6 +178,8 @@ public class PlayerController : MonoBehaviour
     {
         GameObject[] tempDeck = new GameObject[i_DeckSize];
         m_Grave = new GameObject[i_DeckSize];
+        m_Hand = new GameObject[m_MaxHandSize];
+
         for (int i = 0; i < tempDeck.Length; i++)
         {
             float randTemp = Random.Range(0, 14);

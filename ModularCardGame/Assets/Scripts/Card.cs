@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Card : MonoBehaviour
 {
     public string m_CardName;
@@ -11,5 +12,17 @@ public class Card : MonoBehaviour
     {
         m_CardName = i_Name;
         m_Position = i_Position;
+    }
+
+    public void Illuminate()
+    {
+        Renderer rend = GetComponent<Renderer>();
+        rend.material.SetColor("_Color", Color.green);
+    }
+
+    public void UnIlluminate()
+    {
+        Renderer rend = GetComponent<Renderer>();
+        rend.material.SetColor("_Color", Color.white);
     }
 }
