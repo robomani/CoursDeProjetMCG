@@ -25,7 +25,7 @@ SubstanceImporter:
         stringvalue: 
     - name: $randomseed
       value:
-        scalar[0]: 0
+        scalar[0]: 582
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -33,7 +33,7 @@ SubstanceImporter:
         stringvalue: 
     - name: Zoom
       value:
-        scalar[0]: 4.71
+        scalar[0]: 4.62
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -131,7 +131,7 @@ SubstanceImporter:
       - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     textureParameters:
     - name: EasyGrass_basecolor
-      alphaSource: 6
+      alphaSource: 1
       filterMode: 1
       aniso: 1
       wrapMode: 0
@@ -141,7 +141,7 @@ SubstanceImporter:
       aniso: 1
       wrapMode: 0
     - name: EasyGrass_metallic
-      alphaSource: 7
+      alphaSource: 1
       filterMode: 1
       aniso: 1
       wrapMode: 0

@@ -16,13 +16,11 @@ public class Card : MonoBehaviour
 
     public void Illuminate()
     {
-        Renderer rend = GetComponent<Renderer>();
-        rend.material.SetColor("_Color", Color.green);
+        GetComponent<Renderer>().material.SetColor("_Color", Color.green);
     }
 
     public void UnIlluminate()
     {
-        Renderer rend = GetComponent<Renderer>();
-        rend.material.SetColor("_Color", Color.white);
+        GetComponent<Renderer>().material.SetColor("_Color", Color.white);
     }
 }
