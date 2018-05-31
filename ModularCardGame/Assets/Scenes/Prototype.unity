@@ -1458,19 +1458,33 @@ MonoBehaviour:
   m_HP: 20
   m_MaxMana: 1
   m_NBRSoldat: 10
+  m_SoldatSkin: {fileID: 2100000, guid: 370270dfb3f818448b5b9a7a32683854, type: 2}
   m_NBRMage: 5
+  m_MageSkin: {fileID: 2100000, guid: 9f04094319fd78c4c893693b637e213e, type: 2}
   m_NBRArbaletrier: 5
+  m_ArbaletrierSkin: {fileID: 2100000, guid: 357f3830be97f30419eea1a5c9a7f787, type: 2}
   m_NBRSort: 10
+  m_SortSkin: {fileID: 2100000, guid: 6d54f4856bd4d37489a624d7d408e56f, type: 2}
   m_NBRForge: 2
+  m_ForgeSkin: {fileID: 2100000, guid: d3d17d9c20f6d8641bb92b91a23e86ed, type: 2}
   m_NBRMur: 5
+  m_MurSkin: {fileID: 2100000, guid: 294bbedbb88236d48b74b025e76621fa, type: 2}
   m_NBRTour: 3
+  m_TourSkin: {fileID: 2100000, guid: c55da5ccf5f1d6c4f94ca8cfd5da0ab9, type: 2}
   m_NBRHp: 7
+  m_HPSkin: {fileID: 2100000, guid: 3e919c3d7d719434bb0f0c1529b58d5c, type: 2}
   m_NBRAttaque: 7
+  m_AttaqueSkin: {fileID: 2100000, guid: 154fc0a0f88a3134c9a250d8150ab461, type: 2}
   m_NBRMouvement: 3
+  m_MouvementSkin: {fileID: 2100000, guid: 2c03f9616b7fa8f4e833c0e1ba9185f0, type: 2}
   m_NBRPousse: 2
+  m_PousseSkin: {fileID: 2100000, guid: 3c26f67f953a5304e86632e2fb63c649, type: 2}
   m_NBREchange: 2
+  m_EchangeSkin: {fileID: 2100000, guid: 557ea26aed8083c4eab172e9d21b4fd5, type: 2}
   m_NBRArmure: 2
+  m_ArmureSkin: {fileID: 2100000, guid: f948be069f09afb4cb7dc9c5ee4f1f0d, type: 2}
   m_NBROmbre: 2
+  m_OmbreSkin: {fileID: 2100000, guid: 43b82f2c5abd8a6418d3fbbe38753cc2, type: 2}
   m_CardPrefab: {fileID: 1070873630000256, guid: 9eea8dca1ccc62d43b0c138b7256b7f0,
     type: 2}
   m_PlayerDeckPosition: {fileID: 1987800165}

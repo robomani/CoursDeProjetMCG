@@ -14,31 +14,59 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private int m_NBRSoldat = 10;
     [SerializeField]
+    private Material m_SoldatSkin;
+    [SerializeField]
     private int m_NBRMage = 5;
+    [SerializeField]
+    private Material m_MageSkin;
     [SerializeField]
     private int m_NBRArbaletrier = 5;
     [SerializeField]
+    private Material m_ArbaletrierSkin;
+    [SerializeField]
     private int m_NBRSort = 10;
+    [SerializeField]
+    private Material m_SortSkin;
     [SerializeField]
     private int m_NBRForge = 2;
     [SerializeField]
+    private Material m_ForgeSkin;
+    [SerializeField]
     private int m_NBRMur = 5;
+    [SerializeField]
+    private Material m_MurSkin;
     [SerializeField]
     private int m_NBRTour = 3;
     [SerializeField]
+    private Material m_TourSkin;
+    [SerializeField]
     private int m_NBRHp = 7;
+    [SerializeField]
+    private Material m_HPSkin;
     [SerializeField]
     private int m_NBRAttaque = 7;
     [SerializeField]
+    private Material m_AttaqueSkin;
+    [SerializeField]
     private int m_NBRMouvement = 3;
+    [SerializeField]
+    private Material m_MouvementSkin;
     [SerializeField]
     private int m_NBRPousse = 2;
     [SerializeField]
+    private Material m_PousseSkin;
+    [SerializeField]
     private int m_NBREchange = 2;
+    [SerializeField]
+    private Material m_EchangeSkin;
     [SerializeField]
     private int m_NBRArmure = 2;
     [SerializeField]
+    private Material m_ArmureSkin;
+    [SerializeField]
     private int m_NBROmbre = 2;
+    [SerializeField]
+    private Material m_OmbreSkin;
     [SerializeField]
     private GameObject m_CardPrefab;
     [SerializeField]
@@ -186,58 +214,72 @@ public class PlayerController : MonoBehaviour
             if (randTemp == 0 && m_NBRSoldat > 0)
             {
                 tempDeck[i] = AddCardToDeck("Soldat",ref m_NBRSoldat, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_SoldatSkin;
             }
             else if (randTemp == 1 && m_NBRMage > 0)
             {
                 tempDeck[i] = AddCardToDeck("Mage", ref m_NBRMage, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_MageSkin;
             }
             else if (randTemp == 2 && m_NBRArbaletrier > 0)
             {
                 tempDeck[i] = AddCardToDeck("Arbaletrier", ref m_NBRArbaletrier, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_ArbaletrierSkin;
             }
             else if (randTemp == 3 && m_NBRSort > 0)
             {
                 tempDeck[i] = AddCardToDeck("Sort", ref m_NBRSort, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_SortSkin;
             }
             else if (randTemp == 4 && m_NBRForge > 0)
             {
                 tempDeck[i] = AddCardToDeck("Forge", ref m_NBRForge, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_ForgeSkin;
             }
             else if (randTemp == 5 && m_NBRMur > 0)
             {
                 tempDeck[i] = AddCardToDeck("Mur", ref m_NBRMur, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_MurSkin;
             }
             else if (randTemp == 6 && m_NBRTour > 0)
             {
                 tempDeck[i] = AddCardToDeck("Tour", ref m_NBRTour, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_TourSkin;
             }
             else if (randTemp == 7 && m_NBRHp > 0)
             {
                 tempDeck[i] = AddCardToDeck("Hp", ref m_NBRHp, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_HPSkin;
             }
             else if (randTemp == 8 && m_NBRAttaque > 0)
             {
                 tempDeck[i] = AddCardToDeck("Attaque", ref m_NBRAttaque, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_AttaqueSkin;
             }
             else if (randTemp == 9 && m_NBRMouvement > 0)
             {
                 tempDeck[i] = AddCardToDeck("Mouvement", ref m_NBRMouvement, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_MouvementSkin;
             }
             else if (randTemp == 10 && m_NBRPousse > 0)
             {
                 tempDeck[i] = AddCardToDeck("Pousse", ref m_NBRPousse, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_PousseSkin;
             }
             else if (randTemp == 11 && m_NBREchange > 0)
             {
                 tempDeck[i] = AddCardToDeck("Echange", ref m_NBREchange, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_EchangeSkin;
             }
             else if (randTemp == 12 && m_NBRArmure > 0)
             {
                 tempDeck[i] = AddCardToDeck("Armure", ref m_NBRArmure, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_ArmureSkin;
             }
             else if (randTemp == 13 && m_NBROmbre > 0)
             {
                 tempDeck[i] = AddCardToDeck("Ombre", ref m_NBROmbre, i);
+                tempDeck[i].GetComponent<Renderer>().material = m_OmbreSkin;
             }
             else
             {
