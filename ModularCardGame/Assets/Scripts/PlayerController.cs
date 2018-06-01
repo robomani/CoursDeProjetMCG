@@ -169,11 +169,20 @@ public class PlayerController : MonoBehaviour
             while (m_Deck[i] == null)
             {
                 i++;
+                Debug.Log(i + " / " + m_Deck.Length.ToString());
+                if (i > m_Deck.Length - 1)
+                {
+                    Debug.Log("Shuffle");
+                    ShuffleGraveInDeck();
+                    i = 0;
+                }
+                
             }
             m_Hand[indexLibre] = m_Deck[i];
             Debug.Log(indexLibre);
             if (indexLibre == 0)
             {
+                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
                 m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
                 m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
                 m_Deck[i] = null;
@@ -182,6 +191,7 @@ public class PlayerController : MonoBehaviour
             {
                 temp = m_PlayerHandPosition.position;
                 temp.z += (indexLibre / 2) * 1.7f;
+                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
                 m_Deck[i].transform.Translate(temp);
                 m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
                 m_Deck[i] = null;
@@ -190,6 +200,7 @@ public class PlayerController : MonoBehaviour
             {
                 temp = m_PlayerHandPosition.position;
                 temp.z -= ((indexLibre + 1) / 2) * 1.7f;
+                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
                 m_Deck[i].transform.Translate(temp);
                 m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
                 m_Deck[i] = null;
@@ -208,7 +219,8 @@ public class PlayerController : MonoBehaviour
         if (m_Hand[i_CardNumber].GetComponent<Card>())
         {
             m_Grave[System.Array.IndexOf(m_Grave, null)] = m_Hand[i_CardNumber];
-            m_Hand[i_CardNumber].transform.Translate(m_PlayerGravePosition.position);
+            m_Hand[i_CardNumber].transform.rotation = m_PlayerGravePosition.rotation;
+            m_Hand[i_CardNumber].transform.position = m_PlayerGravePosition.position;
             m_Hand[i_CardNumber] = null;
         }
        
@@ -217,7 +229,7 @@ public class PlayerController : MonoBehaviour
     public GameObject AddCardToDeck( string i_Type,ref int r_Counter, int i_Position)
     {
 
-        GameObject deckTemp = Instantiate(m_CardPrefab, Vector3.zero, Quaternion.identity, m_PlayerDeckPosition);
+        GameObject deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
         deckTemp.GetComponent<Card>().m_CardName = i_Type;
         deckTemp.GetComponent<Card>().m_Position = i_Position;
         deckTemp.name = i_Type;
@@ -226,6 +238,28 @@ public class PlayerController : MonoBehaviour
             r_Counter--;
         }
         return deckTemp;
+    }
+
+    public void ShuffleGraveInDeck()
+    {   
+        int i = 0;
+        while (m_Deck[i] != null)
+        {
+            i++;
+        }
+        int nbrCardToShuffle = i;
+        while (nbrCardToShuffle > 0)
+        {
+            int randTemp = Random.Range(0, i);
+            if (m_Grave[randTemp] != null)
+            {
+                m_Deck[i - nbrCardToShuffle] = m_Grave[randTemp];
+                m_Grave[randTemp].transform.rotation = m_PlayerDeckPosition.rotation;
+                m_Grave[randTemp].transform.position = m_PlayerDeckPosition.position;
+                m_Grave[randTemp] = null;
+                nbrCardToShuffle--;
+            }
+        }
     }
 
     public void GenerateDeck(int i_DeckSize = 65)
