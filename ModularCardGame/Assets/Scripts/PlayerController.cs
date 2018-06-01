@@ -89,6 +89,7 @@ public class PlayerController : MonoBehaviour
     public GameObject[] m_Grave;
 
     private bool m_PlayerTurn = true;
+    private int m_CountPlayerHand = 0;
     private int m_Mana = 1;
     private int m_SelectedCardIndex;
     private Ray m_RayPlayerHand;
@@ -116,7 +117,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(Input.GetKeyDown(KeyCode.DownArrow))
         {
-            DiscardCard(0);
+            DiscardCard(m_LastCard.m_Position);
         }
 
         m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -160,16 +161,40 @@ public class PlayerController : MonoBehaviour
 
     public void DrawCard()
     {
-        if (System.Array.IndexOf(m_Hand, null) > -1)
+        Vector3 temp = new Vector3();
+        int indexLibre = System.Array.IndexOf(m_Hand, null);
+        if (indexLibre > -1)
         {
             int i = 0;
             while (m_Deck[i] == null)
             {
                 i++;
             }
-            m_Hand[System.Array.IndexOf(m_Hand, null)] = m_Deck[i];
-            m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
-            m_Deck[i] = null;
+            m_Hand[indexLibre] = m_Deck[i];
+            Debug.Log(indexLibre);
+            if (indexLibre == 0)
+            {
+                m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
+                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
+                m_Deck[i] = null;
+            }
+            else if (indexLibre % 2 == 0)
+            {
+                temp = m_PlayerHandPosition.position;
+                temp.z += (indexLibre / 2) * 1.7f;
+                m_Deck[i].transform.Translate(temp);
+                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
+                m_Deck[i] = null;
+            }
+            else
+            {
+                temp = m_PlayerHandPosition.position;
+                temp.z -= ((indexLibre + 1) / 2) * 1.7f;
+                m_Deck[i].transform.Translate(temp);
+                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
+                m_Deck[i] = null;
+            }
+           
         }
         else
         {
@@ -185,7 +210,8 @@ public class PlayerController : MonoBehaviour
             m_Grave[System.Array.IndexOf(m_Grave, null)] = m_Hand[i_CardNumber];
             m_Hand[i_CardNumber].transform.Translate(m_PlayerGravePosition.position);
             m_Hand[i_CardNumber] = null;
-        }   
+        }
+       
     }
 
     public GameObject AddCardToDeck( string i_Type,ref int r_Counter, int i_Position)
