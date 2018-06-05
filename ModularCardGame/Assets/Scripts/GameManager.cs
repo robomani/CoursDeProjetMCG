@@ -41,10 +41,4 @@ public class GameManager : MonoBehaviour
             m_Altars[1].transform.localScale = new Vector3((1.5f + m_DivideBetweenTiles) * (m_TilesAlongAltars + 2) - m_DivideBetweenTiles, 1f, 2f);
         }
 	}
-	
-
-	private void Update ()
-    {
-		
-	}
 }

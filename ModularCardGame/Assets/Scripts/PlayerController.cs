@@ -75,6 +75,8 @@ public class PlayerController : MonoBehaviour
     private Transform m_PlayerHandPosition;
     [SerializeField]
     private Transform m_PlayerGravePosition;
+    [SerializeField]
+    private GameObject m_ZoomCard;
 
     [SerializeField]
     private int m_RandomDeckSize = 65;
@@ -91,11 +93,11 @@ public class PlayerController : MonoBehaviour
     private bool m_PlayerTurn = true;
     private int m_CountPlayerHand = 0;
     private int m_Mana = 1;
-    private int m_SelectedCardIndex;
     private Ray m_RayPlayerHand;
-    private Card m_LastCard = new Card("",-1);
+    private Card m_LastCard = null;
+    private Card m_SelectedCard = null;
 
-#endregion
+    #endregion
 
     private void Start()
     {
@@ -106,7 +108,12 @@ public class PlayerController : MonoBehaviour
         else
         {
             GenerateDeck(m_NBRSoldat + m_NBRMage + m_NBRArbaletrier + m_NBRSort + m_NBRForge + m_NBRMur + m_NBRTour + m_NBRHp + m_NBRAttaque + m_NBRMouvement + m_NBRPousse + m_NBREchange + m_NBRArmure + m_NBROmbre);
-        }  
+        }
+
+        for (int i = 0; i < 7; i++)
+        {
+            DrawCard();
+        }
     }
 
     private void Update()
@@ -127,20 +134,59 @@ public class PlayerController : MonoBehaviour
             Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
             if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
             {
-                if (m_LastCard.m_CardName != "" && m_LastCard.m_Position != HitInfo.transform.GetComponent<Card>().m_Position)
+                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard)
                 {
                     m_LastCard.UnIlluminate();
                 }
-                Debug.Log(HitInfo.transform.name);
-                m_SelectedCardIndex = HitInfo.transform.GetComponent<Card>().m_Position;
-                HitInfo.transform.GetComponent<Card>().Illuminate();
+
+
+                if (Input.GetButtonDown("Select"))
+                {
+                    if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
+                    {
+                        if (m_SelectedCard != null)
+                        {
+                            m_SelectedCard.UnIlluminate();
+                        }
+                        m_SelectedCard = HitInfo.transform.GetComponent<Card>();
+                        m_SelectedCard.SelectedColor();
+                    }
+                    else
+                    {
+                        m_SelectedCard.UnIlluminate();
+                        m_SelectedCard = null;
+                    }
+                    
+                }
+
+                if (Input.GetButtonDown("Zoom"))
+                {
+                    m_ZoomCard.SetActive(true);
+                    m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
+                    m_ZoomCard.GetComponent<Card>().UnIlluminate();
+                }
+
+                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>())
+                {
+                    HitInfo.transform.GetComponent<Card>().Illuminate();
+
+                }
+                              
                 m_LastCard = HitInfo.transform.GetComponent<Card>();
 
             }
             else
             {
-                m_LastCard.UnIlluminate();
-                m_LastCard.m_CardName = "";
+                if (m_LastCard != null && m_LastCard != m_SelectedCard)
+                {
+                    m_LastCard.UnIlluminate();
+                    m_LastCard.m_CardName = "";
+                }
+
+                if (Input.GetButtonDown("Zoom"))
+                {
+                    m_ZoomCard.SetActive(false);
+                }
             }
         }
     }
@@ -170,42 +216,31 @@ public class PlayerController : MonoBehaviour
             {
                 i++;
                 Debug.Log(i + " / " + m_Deck.Length.ToString());
-                if (i > m_Deck.Length - 1)
+                if (i >= m_Deck.Length)
                 {
                     Debug.Log("Shuffle");
                     ShuffleGraveInDeck();
                     i = 0;
-                }
-                
+                    break;
+                }  
             }
             m_Hand[indexLibre] = m_Deck[i];
             Debug.Log(indexLibre);
+            temp = m_PlayerHandPosition.position;
             if (indexLibre == 0)
             {
-                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
-                m_Deck[i].transform.Translate(m_PlayerHandPosition.position);
-                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
-                m_Deck[i] = null;
             }
             else if (indexLibre % 2 == 0)
             {
-                temp = m_PlayerHandPosition.position;
                 temp.z += (indexLibre / 2) * 1.7f;
-                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
-                m_Deck[i].transform.Translate(temp);
-                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
-                m_Deck[i] = null;
             }
             else
             {
-                temp = m_PlayerHandPosition.position;
                 temp.z -= ((indexLibre + 1) / 2) * 1.7f;
-                m_Deck[i].transform.rotation = m_PlayerHandPosition.rotation;
-                m_Deck[i].transform.Translate(temp);
-                m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
-                m_Deck[i] = null;
             }
-           
+            m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
+            m_Deck[i] = null;
+            StartCoroutine(PlayerDrawCardMove(m_Hand[indexLibre].transform, temp));
         }
         else
         {
@@ -243,7 +278,7 @@ public class PlayerController : MonoBehaviour
     public void ShuffleGraveInDeck()
     {   
         int i = 0;
-        while (m_Deck[i] != null)
+        while (m_Grave[i] != null)
         {
             i++;
         }
@@ -348,5 +383,29 @@ public class PlayerController : MonoBehaviour
         }
 
         m_Deck = tempDeck;
+    }
+
+    private IEnumerator PlayerDrawCardMove(Transform i_Card , Vector3 i_EndPos)
+    {
+        float currentTime = 0f;
+        float timeToDraw = 1.5f;
+
+        yield return new WaitForSeconds(0.2f);
+        float value;
+
+        while (currentTime != timeToDraw)
+        {
+            currentTime += Time.deltaTime;
+            if (currentTime > timeToDraw)
+            {
+                currentTime = timeToDraw;
+            }
+
+            value = currentTime / timeToDraw;
+            i_Card.position = Vector3.Lerp(m_PlayerDeckPosition.position, i_EndPos, value);
+            i_Card.rotation = Quaternion.Slerp(m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, value);
+            yield return new WaitForEndOfFrame();
+        }
+        currentTime = 0f;
     }
 }
