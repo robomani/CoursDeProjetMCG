@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4835614771338826}
   - component: {fileID: 33517732403253970}
   - component: {fileID: 23757771938967666}
-  - component: {fileID: 114619905133432364}
   - component: {fileID: 65663491493590782}
   m_Layer: 8
   m_Name: Card
@@ -125,16 +124,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 0.11766098, z: 1.5}
   m_Center: {x: -1, y: 0.05883049, z: -0.75}
---- !u!114 &114619905133432364
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1070873630000256}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dfa81e3418966d4b9648156e4acb4d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CardName: Soldat
-  m_Position: 0

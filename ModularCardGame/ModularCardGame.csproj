@@ -241,11 +241,11 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
-    <Reference Include="TextMeshPro-2017.3-Runtime">
-      <HintPath>Assets\Plugins\TextMesh Pro\Plugins\Editor DLL\TextMeshPro-2017.3-Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="TextMeshPro-2017.3-Editor">
       <HintPath>Assets\Plugins\TextMesh Pro\Plugins\Editor DLL\TextMeshPro-2017.3-Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="TextMeshPro-2017.3-Runtime">
+      <HintPath>Assets\Plugins\TextMesh Pro\Plugins\Editor DLL\TextMeshPro-2017.3-Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +256,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Card.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Arbaletrier.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Armure.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Attaque.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Echange.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Forge.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Hp.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Mage.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Mouvement.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Mur.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Ombre.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Pousse.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Soldat.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Sort.cs" />
+    <Compile Include="Assets\Scripts\CardTypes\Tour.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\TileController.cs" />
