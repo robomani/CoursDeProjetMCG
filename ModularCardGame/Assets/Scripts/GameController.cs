@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 [System.Serializable]
 public struct CardClass
@@ -12,69 +13,145 @@ public struct CardClass
     public string m_ScriptToAttach;
 }
 
-public class PlayerController : MonoBehaviour
+public class GameController : MonoBehaviour
 {
-#region Variables
+    #region Variables
 
+    #region Player Base Stats
+    [Tooltip("Nombre de vie de base du joueur")]
+    [SerializeField]
+    private int m_HpJoueur = 20;
 
+    [Tooltip("Le texte qui affiche le nombre de vie du joueur")]
     [SerializeField]
-    private int m_HP = 20;
+    private TextMeshProUGUI m_HpJoueurText;
+
+    [Tooltip("Nombre de Mana Maximum du joueur")]
     [SerializeField]
-    private int m_MaxMana = 1;
+    private int m_MaxManaJoueur = 1;
+
+    [Tooltip("Le texte qui affiche le nombre de mana du joueur")]
+    [SerializeField]
+    private TextMeshProUGUI m_ManaJoueurText;
+    #endregion
+
+    #region AI Base Stats
+    [Tooltip("Nombre de vie de base de l'IA")]
+    [SerializeField]
+    private int m_HpAI = 20;
+
+    [Tooltip("Le texte qui affiche le nombre de vie de l'IA")]
+    [SerializeField]
+    private TextMeshProUGUI m_HpAIText;  
+
+    [Tooltip("Nombre de Mana Maximum de l'IA")]
+    [SerializeField]
+    private int m_MaxManaAI = 1;
+
+    [Tooltip("Le texte qui affiche le nombre de mana de l'IA")]
+    [SerializeField]
+    private TextMeshProUGUI m_ManaAIText;
+    #endregion
+
+    #region Card Move Speed
+    [Tooltip("Vitesse de mouvement des cartes des deck aux mains")]
+    [SerializeField]
+
+    private float m_DrawTime = 1.5f;
+    [Tooltip("Vitesse de mouvement des cartes des mains aux cimetières")]
+    [SerializeField]
+    private float m_DiscardTime = 1.5f;
+
+    [Tooltip("Vitesse de mouvement des cartes des cimetières aux decks")]
+    [SerializeField]
+    private float m_ShuffleTime = 1.5f;
+    #endregion
+
+    [Tooltip("Le préfab des cartes à instancier")]
     [SerializeField]
     private GameObject m_CardPrefab;
+
+    #region Destinations des cartes
+    [Tooltip("Le transform de la position du deck du joueur")]
     [SerializeField]
     private Transform m_PlayerDeckPosition;
+
+    [Tooltip("Le transform de la position du deck de l'IA")]
+    [SerializeField]
+    private Transform m_AIDeckPosition;
+
+    [Tooltip("Le transform de la position de la main du joueur")]
     [SerializeField]
     private Transform m_PlayerHandPosition;
+
+    [Tooltip("Le transform de la position de la main de l'IA")]
+    [SerializeField]
+    private Transform m_AIHandPosition;
+
+    [Tooltip("Le transform de la position du cimetière du joueur")]
     [SerializeField]
     private Transform m_PlayerGravePosition;
-    [SerializeField]
-    private GameObject m_ZoomCard;
 
+    [Tooltip("Le transform de la position du cimetière de l'IA")]
+    [SerializeField]
+    private Transform m_AIGravePosition;
+
+    [Tooltip("La carte qui prend l'apparence de la carte sur laquelle le joueur zoom")]
+    [SerializeField]
+    #endregion
+
+    private GameObject m_ZoomCard;
+    [Tooltip("Le bouton qui permet de discarter la carte selectionnée")]
+    [SerializeField]
+    private GameObject m_BtnDiscard;
+
+    [Tooltip("Liste des types de cartes à placer dans les decks")]
     [SerializeField]
     private List<CardClass> m_CardTypes = new List<CardClass>();
 
+    #region Deck Aléatoire
+    [Tooltip("Nombre de carte dans le deck si le deck est crée aléatoirement")]
     [SerializeField]
     private int m_RandomDeckSize = 65;
+
+    [Tooltip("Si actif crée le deck avec une composition aléatoire parmit toutes les cartes possibles et avec un nombre de carte choisie")]
     [SerializeField]
     private bool m_RandomDeck = false;
+    #endregion
+
+    [Tooltip("Nombre de carte simultané maximum dans la mains d'un joueurs")]
     [SerializeField]
     private int m_MaxHandSize = 7;
 
 
-    public GameObject[] m_Hand;
-    public GameObject[] m_Deck;
-    public GameObject[] m_Grave;
+    private GameObject[] m_Hand;
+    private GameObject[] m_Deck;
+    private GameObject[] m_Grave;
 
     private bool m_PlayerTurn = true;
     private int m_CountPlayerHand = 0;
-    private int m_Mana = 1;
+    private int m_PlayerMana = 1;
+    private int m_AIMana = 1;
     private int[] m_CardNumberByType;
     private Ray m_RayPlayerHand;
     private Card m_LastCard = null;
     private Card m_SelectedCard = null;
+    private Vector3 m_CardOriginalPosition;
+    private Vector3 m_TempPosition;
 
     #endregion
 
     private void Start()
     {
-        
+        int nbrCardToAdd = Initialise();
+
         if (m_RandomDeck)
         {
-            GenerateDeck(m_RandomDeckSize);
+            m_Deck = GenerateDeck(m_RandomDeckSize);
         }
         else
         {
-            int countCardToAdd = 0;
-            int[] temp = new int[m_CardTypes.Count];
-            for (int i = 0; i < m_CardTypes.Count; i++)
-            {
-                countCardToAdd += m_CardTypes[i].m_NbrInDeck;
-                temp[i] = m_CardTypes[i].m_NbrInDeck;
-            }
-            m_CardNumberByType = temp;
-            GenerateDeck(countCardToAdd);
+            m_Deck = GenerateDeck(nbrCardToAdd);
         }
 
         for (int i = 0; i < 7; i++)
@@ -83,6 +160,28 @@ public class PlayerController : MonoBehaviour
         }
         
     }
+
+    //Initialise l'array du nombre de chaque type de carte à ajouter dans le deck.
+    //Retourne le nombre total de carte à ajouter dans le deck si l'on respecte le nombre de carte de chaque type
+    private int Initialise()
+    {
+        int countCardToAdd = 0;
+        int[] temp = new int[m_CardTypes.Count];
+        for (int i = 0; i < m_CardTypes.Count; i++)
+        {
+            countCardToAdd += m_CardTypes[i].m_NbrInDeck;
+            temp[i] = m_CardTypes[i].m_NbrInDeck;
+        }
+        m_CardNumberByType = temp;
+
+        m_HpJoueurText.text = m_HpJoueur.ToString();
+        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+        m_HpAIText.text = m_HpAI.ToString();
+        m_ManaAIText.text = m_AIMana.ToString() + "/" + m_MaxManaAI.ToString();
+
+        return countCardToAdd;
+    }
+
 
     private void Update()
     {
@@ -114,20 +213,27 @@ public class PlayerController : MonoBehaviour
                         }
                         m_SelectedCard = HitInfo.transform.GetComponent<Card>();
                         m_SelectedCard.SelectedColor();
+                        m_BtnDiscard.SetActive(true);
+                        Vector3 temp = m_SelectedCard.transform.position;
+                        temp.y += 1f;
+                        temp.x -= 2.5f;
+                        temp.z -= 0.75f;
+                        m_BtnDiscard.transform.position = temp;
                     }
                     else
                     {
                         m_SelectedCard.UnIlluminate();
                         m_SelectedCard = null;
+                        m_BtnDiscard.SetActive(false);
                     }
                     
                 }
+                
 
                 if (Input.GetButtonDown("Zoom"))
                 {
                     m_ZoomCard.SetActive(true);
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
-                    m_ZoomCard.GetComponent<Card>().UnIlluminate();
                 }
 
                 if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>())
@@ -152,20 +258,46 @@ public class PlayerController : MonoBehaviour
                     m_ZoomCard.SetActive(false);
                 }
             }
+
+            if (Input.GetButton("Select"))
+            {
+                if (m_SelectedCard != null)
+                {
+                    Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f);
+                    m_CardOriginalPosition = m_SelectedCard.transform.position;
+                    m_TempPosition = HitInfo.point;
+                    m_TempPosition.y = m_CardOriginalPosition.y;
+                    m_TempPosition.x += 0.75f;
+                    m_TempPosition.z += 1f;
+                    m_SelectedCard.transform.position = m_TempPosition;
+                }
+            }
+            else if (m_SelectedCard != null)
+            {               
+                m_SelectedCard.transform.position = m_CardOriginalPosition;
+            }
         }
     }
 
     public void Cast(int i_ManaCost)
     {
-        m_Mana -= i_ManaCost;
+        if (m_PlayerTurn)
+        {
+            m_PlayerMana -= i_ManaCost;
+        }
+        else
+        {
+            m_AIMana -= i_ManaCost;
+        }
+        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
     }
 
-    public void RaiseMaxMana()
+    public void RaiseMaxPlayerMana()
     {
-        if (m_Mana > 0)
+        if (m_PlayerMana > 0)
         {
-            m_Mana = 0;
-            m_MaxMana++;
+            m_PlayerMana = 0;
+            m_MaxManaJoueur++;
         }
     }
 
@@ -201,7 +333,7 @@ public class PlayerController : MonoBehaviour
             }
             m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
             m_Deck[i] = null;
-            StartCoroutine(PlayerDrawCardMove(m_Hand[indexLibre].transform, temp));
+            StartCoroutine(CardMove(m_Hand[indexLibre].transform, m_PlayerDeckPosition.position, temp, m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, m_DrawTime));
         }
         else
         {
@@ -215,14 +347,23 @@ public class PlayerController : MonoBehaviour
         if (m_SelectedCard != null)
         {
             m_Grave[System.Array.IndexOf(m_Grave, null)] = m_SelectedCard.gameObject;
-            m_SelectedCard.transform.rotation = m_PlayerGravePosition.rotation;
-            m_SelectedCard.transform.position = m_PlayerGravePosition.position;
+            StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_PlayerGravePosition.position, m_SelectedCard.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
             m_Hand[m_SelectedCard.m_Position] = null;
             m_SelectedCard = null;
-
+            m_ZoomCard.SetActive(false);
             DrawCard();
         }
        
+    }
+
+    public void MulliganHand()
+    {
+        for (int i = 0; i < m_Hand.Length; i++)
+        {
+            m_SelectedCard = m_Hand[i].GetComponent<Card>();
+            DiscardCard();
+        }
+        
     }
 
     public GameObject AddCardToDeck( int i_Counter, int i_Position)
@@ -254,15 +395,14 @@ public class PlayerController : MonoBehaviour
             if (m_Grave[randTemp] != null)
             {
                 m_Deck[i - nbrCardToShuffle] = m_Grave[randTemp];
-                m_Grave[randTemp].transform.rotation = m_PlayerDeckPosition.rotation;
-                m_Grave[randTemp].transform.position = m_PlayerDeckPosition.position;
+                StartCoroutine(CardMove(m_Grave[randTemp].transform, m_PlayerGravePosition.position, m_PlayerDeckPosition.position, m_PlayerGravePosition.rotation, m_PlayerDeckPosition.rotation, m_ShuffleTime));
                 m_Grave[randTemp] = null;
                 nbrCardToShuffle--;
             }
         }
     }
 
-    public void GenerateDeck(int i_DeckSize = 65)
+    public GameObject[] GenerateDeck(int i_DeckSize = 65)
     {
         GameObject[] tempDeck = new GameObject[i_DeckSize];
         m_Grave = new GameObject[i_DeckSize];
@@ -282,28 +422,27 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        m_Deck = tempDeck;
+        return tempDeck;
     }
 
-    private IEnumerator PlayerDrawCardMove(Transform i_Card , Vector3 i_EndPos)
+    private IEnumerator CardMove(Transform i_Card, Vector3 i_StartPos, Vector3 i_EndPos, Quaternion i_StartRot, Quaternion i_EndRot, float i_MoveTime)
     {
         float currentTime = 0f;
-        float timeToDraw = 1.5f;
 
         yield return new WaitForSeconds(0.2f);
         float value;
 
-        while (currentTime != timeToDraw)
+        while (currentTime != i_MoveTime)
         {
             currentTime += Time.deltaTime;
-            if (currentTime > timeToDraw)
+            if (currentTime > i_MoveTime)
             {
-                currentTime = timeToDraw;
+                currentTime = i_MoveTime;
             }
 
-            value = currentTime / timeToDraw;
-            i_Card.position = Vector3.Lerp(m_PlayerDeckPosition.position, i_EndPos, value);
-            i_Card.rotation = Quaternion.Slerp(m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, value);
+            value = currentTime / i_MoveTime;
+            i_Card.position = Vector3.Lerp(i_StartPos, i_EndPos, value);
+            i_Card.rotation = Quaternion.Slerp(i_StartRot, i_EndRot, value);
             yield return new WaitForEndOfFrame();
         }
         currentTime = 0f;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class BoardGenerator : MonoBehaviour
 {
     public int m_TilesBetweenAltars = 5;
     public int m_TilesAlongAltars = 3;
