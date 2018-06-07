@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class BoardGenerator : MonoBehaviour
 {
-    public int m_TilesBetweenAltars = 5;
-    public int m_TilesAlongAltars = 3;
-    public float m_DivideBetweenTiles = 0.5f;
+    
     public GameObject m_TilePrefab;
     public GameObject m_AltarPrefab;
     public GameObject[] m_Tiles;
     public GameObject[] m_Altars;
 
+    private int m_TilesBetweenAltars = 5;
+    private int m_TilesAlongAltars = 3;
+    private float m_DivideBetweenTiles = 0.5f;
 
-	private void Start ()
+    private void Start ()
     {
         if (m_TilePrefab && m_AltarPrefab)
         {
@@ -38,7 +39,7 @@ public class BoardGenerator : MonoBehaviour
             nextPosition.z += (2f * (m_TilesBetweenAltars + 1)) + m_DivideBetweenTiles;
             nextPosition.x = transform.position.x;
             m_Altars[1] = Instantiate(m_AltarPrefab, nextPosition, transform.rotation, transform) as GameObject;
-            m_Altars[1].transform.localScale = new Vector3((1.5f + m_DivideBetweenTiles) * (m_TilesAlongAltars + 2) - m_DivideBetweenTiles, 1f, 2f);
+            m_Altars[1].transform.localScale = new Vector3((1.5f + m_DivideBetweenTiles) * (m_TilesAlongAltars + 2) - m_DivideBetweenTiles, 1f, -2f);
         }
 	}
 }

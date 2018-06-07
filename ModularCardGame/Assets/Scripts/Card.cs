@@ -5,12 +5,23 @@ using UnityEngine;
 
 public class Card : MonoBehaviour
 {
-    public string m_CardName;
-    public int m_Position;
 
+    public enum States
+    {
+        InDeck,
+        InHand,
+        InPlay,
+        InGrave
+    }
+
+    public int m_Position;
+    public int m_Portee = 1;
+    public int m_Mouvement = 0;
+    public string m_CardName;
+    public States m_State = States.InDeck;
     protected Renderer m_Renderer;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         m_Renderer = GetComponent<Renderer>();
     }
