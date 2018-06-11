@@ -16,6 +16,6 @@ public class Sort : Card
     protected override void Awake()
     {
         base.Awake();
-        m_Portee = 2;
+        m_CastRange = 2;
     }
 }

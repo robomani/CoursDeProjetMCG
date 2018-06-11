@@ -15,8 +15,22 @@ public class Card : MonoBehaviour
     }
 
     public int m_Position;
-    public int m_Portee = 1;
+
+    public TileController m_TileOccupied;
+
+    #region Card Stats
+    public int m_CastCost = 1;
+    public int m_CastRange = 1;
+
+    public int m_ActivateCost = 1;
+
+    public int m_Attack = 1;
+    public int m_AttackRange = 1;
+
+    public int m_Hp = 1;
     public int m_Mouvement = 0;
+    #endregion
+
     public string m_CardName;
     public States m_State = States.InDeck;
     protected Renderer m_Renderer;

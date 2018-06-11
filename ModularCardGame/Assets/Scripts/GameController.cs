@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using System.Linq;
 
 [System.Serializable]
 public struct CardClass
@@ -108,9 +109,20 @@ public class GameController : MonoBehaviour
     [Tooltip("La carte qui prend l'apparence de la carte sur laquelle le joueur zoom")]
     [SerializeField]
     private GameObject m_ZoomCard;
+
+    #region Reference des boutons
     [Tooltip("Le bouton qui permet de discarter la carte selectionnée")]
     [SerializeField]
     private GameObject m_BtnDiscard;
+
+    [Tooltip("Le bouton qui augmente la mana maximum du joueur")]
+    [SerializeField]
+    private GameObject m_BtnGainMaxMana;
+
+    [Tooltip("Le bouton qui augmente la mana maximum du joueur")]
+    [SerializeField]
+    private GameObject m_BtnPowerDrawCard;
+    #endregion
 
     [Tooltip("Liste des types de cartes à placer dans les decks")]
     [SerializeField]
@@ -138,6 +150,7 @@ public class GameController : MonoBehaviour
     private GameObject[] m_Deck;
     private GameObject[] m_Grave;
 
+    private bool m_PlayerAvatarActive = false;
     private bool m_WaitForMulligan = true;
     private bool m_PlayerTurn = true;
     private int m_PlayerMana = 1;
@@ -183,10 +196,7 @@ public class GameController : MonoBehaviour
         }
         m_CardNumberByType = temp;
 
-        m_HpJoueurText.text = m_HpJoueur.ToString();
-        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
-        m_HpAIText.text = m_HpAI.ToString();
-        m_ManaAIText.text = m_AIMana.ToString() + "/" + m_MaxManaAI.ToString();
+        UpdateTexts();
 
         return countCardToAdd;
     }
@@ -280,22 +290,92 @@ public class GameController : MonoBehaviour
                 m_TempPosition.y += 1;
                 StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                 m_SelectedCard.m_State = Card.States.InPlay;
+                m_Hand[m_SelectedCard.m_Position] = null;
+                m_SelectedCard.m_Position = -1;
+                m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
                 TileHitInfo.transform.GetComponent<TileController>().m_IsOccupied = true;
                 m_BtnDiscard.SetActive(false);
                 ShowNormalTiles();
             }
+
+            if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_PlayerMana > 0)
+            {
+                ActivatePlayerAvatar();
+            }
+
+            if (Input.GetButtonDown("Cheat"))
+            { 
+                DrawCard();
+                m_PlayerMana += 10;
+                m_HpJoueur += 1;
+            }
+
+
+        }
+
+        UpdateTexts();
+    }
+
+    private void ActivatePlayerAvatar()
+    {
+        m_PlayerAvatarActive = !m_PlayerAvatarActive;
+        if (m_PlayerAvatarActive)
+        {
+            m_BtnGainMaxMana.SetActive(false);
+            m_BtnPowerDrawCard.SetActive(false);
+        }
+        else
+        {
+            m_BtnGainMaxMana.SetActive(true);
+            m_BtnPowerDrawCard.SetActive(true);
         }
     }
 
+
+
+    private void UpdateTexts()
+    {
+        m_HpJoueurText.text = m_HpJoueur.ToString();
+        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+        m_HpAIText.text = m_HpAI.ToString();
+        m_ManaAIText.text = m_AIMana.ToString() + "/" + m_MaxManaAI.ToString();
+
+        if (m_BtnPowerDrawCard.activeSelf)
+        {
+            m_BtnPowerDrawCard.GetComponentInChildren<TextMeshProUGUI>().text = "Draw Cost : " + m_Hand.Count(s => s != null).ToString();
+        }
+    }
+
+    public void PowerDrawCard()
+    {
+        if (m_PlayerMana >= m_Hand.Count(s => s != null))
+        {
+            if (m_Hand.Count(s => s == null) > 0)
+            {
+                Cast(m_Hand.Count(s => s != null));
+                DrawCard();
+                ActivatePlayerAvatar();
+            }
+            else
+            {
+                //TODO:: Start a coroutine that flash the Cards in hand red
+            }
+        }
+        else
+        {
+            //TODO:: Start a coroutine that flash the mana counter of the player and the PowerDrawButon
+        }
+
+    }
 
     public void StopWaitingForMulligan()
     {
         m_WaitForMulligan = false;
     }
 
-    public void ShowValidTiles()
+    private void ShowValidTiles()
     {
-        if (m_SelectedCard.m_Portee > -1 && m_SelectedCard.m_State == Card.States.InHand)
+        if (m_SelectedCard.m_CastRange > -1 && m_SelectedCard.m_State == Card.States.InHand)
         {
             int x = 0;
             do
@@ -305,7 +385,7 @@ public class GameController : MonoBehaviour
                     m_Board.m_Tiles[i + (x * 3)].GetComponent<TileController>().Illuminate();
                 }
                 x++;
-            } while (x < m_SelectedCard.m_Portee);
+            } while (x < m_SelectedCard.m_CastRange);
         }
         else if (m_SelectedCard.m_State == Card.States.InPlay && m_SelectedCard.m_Mouvement > 0)
         {
@@ -313,7 +393,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void ShowNormalTiles()
+    private void ShowNormalTiles()
     {
         for (int x = 0; x < m_Board.m_Tiles.Length; x++)
         {
@@ -340,10 +420,11 @@ public class GameController : MonoBehaviour
         {
             m_PlayerMana = 0;
             m_MaxManaJoueur++;
+            m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
         }
     }
 
-    public void DrawCard()
+    private void DrawCard()
     {
         Vector3 temp = new Vector3();
         int indexLibre = System.Array.IndexOf(m_Hand, null);
@@ -410,7 +491,7 @@ public class GameController : MonoBehaviour
         
     }
 
-    public GameObject AddCardToDeck( int i_Counter, int i_Position)
+    private GameObject AddCardToDeck( int i_Counter, int i_Position)
     {
 
         GameObject deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
@@ -426,7 +507,7 @@ public class GameController : MonoBehaviour
         return deckTemp;
     }
 
-    public void ShuffleGraveInDeck()
+    private void ShuffleGraveInDeck()
     {   
         int i = 0;
         while (m_Grave[i] != null)
@@ -448,7 +529,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public GameObject[] GenerateDeck(int i_DeckSize = 65)
+    private GameObject[] GenerateDeck(int i_DeckSize = 65)
     {
         GameObject[] tempDeck = new GameObject[i_DeckSize];
         m_Grave = new GameObject[i_DeckSize];

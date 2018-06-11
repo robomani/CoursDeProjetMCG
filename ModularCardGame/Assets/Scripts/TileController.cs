@@ -6,6 +6,8 @@ public class TileController : MonoBehaviour
 {
     public bool m_IsValid = false;
     public bool m_IsOccupied = false;
+    public int PosX;
+    public int PosY;
 
     private Renderer m_Renderer;
 
