@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: a27dff25399e21a4d88f60994a59bf57
-timeCreated: 1527173090
+guid: 5dc8adbf3b966ea4992fe3d36929df84
+timeCreated: 1528721518
 licenseType: Pro
 ModelImporter:
   serializedVersion: 22
@@ -10,7 +10,7 @@ ModelImporter:
     2100000: lambert1
     2300000: //RootNode
     3300000: //RootNode
-    4300000: GroundTile
+    4300000: Altar
   externalObjects: {}
   materials:
     importMaterials: 1

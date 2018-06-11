@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: bc0b9fe5d987767469bb56036b8ce738
-timeCreated: 1527174839
+guid: 40ce78472d4236d40afde944f91f304f
+timeCreated: 1528720089
 licenseType: Pro
 ModelImporter:
   serializedVersion: 22
@@ -10,7 +10,7 @@ ModelImporter:
     2100000: lambert1
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Wall
+    4300000: Tiles
   externalObjects: {}
   materials:
     importMaterials: 1

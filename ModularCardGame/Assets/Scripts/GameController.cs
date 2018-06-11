@@ -302,7 +302,7 @@ public class GameController : MonoBehaviour
             {           
                 for (int i = 0; i < 3; i++)
                 {
-                    m_Board.m_Tiles[((i * 5) + x)].GetComponent<TileController>().Illuminate();
+                    m_Board.m_Tiles[i + (x * 3)].GetComponent<TileController>().Illuminate();
                 }
                 x++;
             } while (x < m_SelectedCard.m_Portee);
