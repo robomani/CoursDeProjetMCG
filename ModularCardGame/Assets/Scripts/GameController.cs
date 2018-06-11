@@ -274,9 +274,9 @@ public class GameController : MonoBehaviour
                 }
             }
 
-            if (Input.GetButtonDown("Select") && m_SelectedCard != null && (Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles")) && TileHitInfo.transform.GetComponent<TileController>().m_IsValid))
+            if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid)
             {
-                m_TempPosition = TileHitInfo.transform.GetChild(0).position;
+                m_TempPosition = TileHitInfo.transform.position;
                 m_TempPosition.y += 1;
                 StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                 m_SelectedCard.m_State = Card.States.InPlay;
