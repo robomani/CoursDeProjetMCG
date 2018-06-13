@@ -289,12 +289,16 @@ public class GameController : MonoBehaviour
                 m_TempPosition = TileHitInfo.transform.position;
                 m_TempPosition.y += 1;
                 StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                m_SelectedCard.m_State = Card.States.InPlay;
-                m_Hand[m_SelectedCard.m_Position] = null;
-                m_SelectedCard.m_Position = -1;
+                if (m_SelectedCard.m_State == Card.States.InHand)
+                {
+                    m_SelectedCard.m_State = Card.States.InPlay;
+                    m_Hand[m_SelectedCard.m_Position] = null;
+                    m_SelectedCard.m_Position = -1;
+                } 
                 m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
                 TileHitInfo.transform.GetComponent<TileController>().m_IsOccupied = true;
                 m_BtnDiscard.SetActive(false);
+                m_SelectedCard = null;
                 ShowNormalTiles();
             }
 
@@ -309,10 +313,7 @@ public class GameController : MonoBehaviour
                 m_PlayerMana += 10;
                 m_HpJoueur += 1;
             }
-
-
         }
-
         UpdateTexts();
     }
 
@@ -389,7 +390,28 @@ public class GameController : MonoBehaviour
         }
         else if (m_SelectedCard.m_State == Card.States.InPlay && m_SelectedCard.m_Mouvement > 0)
         {
+            TileController tile = null;
+            TileController selected = null;
+            int range = m_SelectedCard.m_Mouvement;
 
+            for (int i = 0; i < m_Board.m_Tiles.Length; i++)
+            {
+                tile = m_Board.m_Tiles[i].GetComponent<TileController>();
+                selected = m_SelectedCard.m_TileOccupied;
+                if (selected.PosX + range >=  tile.PosX && selected.PosX - range <= tile.PosX)
+                {
+                    range = selected.PosX > tile.PosX ? range -= selected.PosX - tile.PosX : range -= tile.PosX - selected.PosX;
+                    if (selected.PosY + range >= tile.PosY && selected.PosY - range <= tile.PosY || (selected.PosX == tile.PosX && selected.PosY + m_SelectedCard.m_Mouvement >= tile.PosY && selected.PosY - m_SelectedCard.m_Mouvement <= tile.PosY))
+                    {
+                        if (tile != selected )
+                        {
+                            tile.Illuminate();
+                        }
+                    }
+                       
+                }
+            }
+            
         }
     }
 
@@ -477,6 +499,7 @@ public class GameController : MonoBehaviour
             m_SelectedCard = null;
             m_ZoomCard.SetActive(false);
             DrawCard();
+            ShowNormalTiles();
         }
        
     }
