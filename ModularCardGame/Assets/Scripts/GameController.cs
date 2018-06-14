@@ -180,7 +180,8 @@ public class GameController : MonoBehaviour
         {
             DrawCard();
         }
-        
+
+        CheckPlayableCard();
     }
 
     //Initialise l'array du nombre de chaque type de carte à ajouter dans le deck.
@@ -204,26 +205,26 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            DrawCard();
-        }
-
         m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit HitInfo;
         RaycastHit TileHitInfo;
+        RaycastHit Dump;
         if (m_PlayerTurn == Card.Players.Player && !m_WaitForMulligan)
         {
             Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
-            if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
+            if (Physics.Raycast(m_RayPlayerHand, out Dump, 1000f, LayerMask.GetMask("B")))
             {
-                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn)
+                Debug.Log("UI");
+            }
+            else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
+            {
+                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn && m_LastCard.m_Playable)
                 {
                     m_LastCard.UnIlluminate();
                 }
 
 
-                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn)
+                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
                     {
@@ -262,7 +263,7 @@ public class GameController : MonoBehaviour
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
                 }
 
-                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn)
+                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     HitInfo.transform.GetComponent<Card>().Illuminate();
                 }
@@ -272,7 +273,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn)
+                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn && m_LastCard.m_Playable)
                 {
                     m_LastCard.UnIlluminate();
                     m_LastCard.m_CardName = "";
@@ -284,7 +285,11 @@ public class GameController : MonoBehaviour
                 }
             }
 
-            if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid)
+            if (Physics.Raycast(m_RayPlayerHand, out Dump, 1000f, LayerMask.GetMask("B")))
+            {
+                Debug.Log(Dump.transform.name);
+            }
+            else if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid )
             {
                 m_TempPosition = TileHitInfo.transform.position;
                 m_TempPosition.y += 1;
@@ -360,6 +365,7 @@ public class GameController : MonoBehaviour
                 Cast(m_Hand.Count(s => s != null));
                 DrawCard();
                 ActivatePlayerAvatar();
+                CheckPlayableCard();
             }
             else
             {
@@ -387,7 +393,10 @@ public class GameController : MonoBehaviour
             {           
                 for (int i = 0; i < 3; i++)
                 {
-                    m_Board.m_Tiles[i + (x * 3)].GetComponent<TileController>().Illuminate();
+                    if (m_Board.m_Tiles[i + (x * 3)].GetComponent<TileController>().m_OccupiedBy == null)
+                    {
+                        m_Board.m_Tiles[i + (x * 3)].GetComponent<TileController>().Illuminate();
+                    }    
                 }
                 x++;
             } while (x < m_SelectedCard.m_CastRange);
@@ -445,6 +454,8 @@ public class GameController : MonoBehaviour
             m_AIMana -= i_ManaCost;
         }
         m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+
+        CheckPlayableCard();
     }
 
     public void RaiseMaxPlayerMana()
@@ -455,6 +466,8 @@ public class GameController : MonoBehaviour
             m_MaxManaJoueur++;
             m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
         }
+
+        CheckPlayableCard();
     }
 
     private void DrawCard()
@@ -495,8 +508,7 @@ public class GameController : MonoBehaviour
         else
         {
             Debug.Log("Main pleine");
-        }
-        
+        } 
     }
 
     public void DiscardCard()
@@ -512,7 +524,7 @@ public class GameController : MonoBehaviour
             DrawCard();
             ShowNormalTiles();
         }
-       
+        CheckPlayableCard();
     }
 
     public void MulliganHand()
@@ -547,6 +559,37 @@ public class GameController : MonoBehaviour
             m_CardNumberByType[i_Counter] -=  1;
         }
         return deckTemp;
+    }
+
+    private void CheckPlayableCard()
+    {
+        foreach (GameObject GO in m_Hand)
+        {
+            if (GO.GetComponent<Card>() && GO.GetComponent<Card>().m_CastCost > m_PlayerMana)
+            {
+                GO.GetComponent<Card>().UnplayableCard();
+            }
+            else
+            {
+                GO.GetComponent<Card>().UnIlluminate();
+            }
+        }
+        
+
+        foreach (GameObject GO in m_Board.m_Tiles)
+        {
+            if (GO.GetComponent<TileController>().m_OccupiedBy != null && GO.GetComponent<TileController>().m_OccupiedBy.m_Owner == m_PlayerTurn)
+            {
+                if (GO.GetComponent<TileController>().m_OccupiedBy.m_ActivateCost > m_PlayerMana)
+                {
+                    GO.GetComponent<TileController>().m_OccupiedBy.UnplayableCard();
+                }
+                else
+                {
+                    GO.GetComponent<TileController>().m_OccupiedBy.UnIlluminate();
+                }
+            }
+        }
     }
 
     private void ShuffleGraveInDeck()

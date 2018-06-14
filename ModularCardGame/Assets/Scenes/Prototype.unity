@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 77088177}
   - component: {fileID: 77088179}
   - component: {fileID: 77088178}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: TextMeshPro Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -657,7 +657,7 @@ GameObject:
   - component: {fileID: 478295129}
   - component: {fileID: 478295128}
   - component: {fileID: 478295127}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: BTN_KeepHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -834,9 +834,9 @@ MonoBehaviour:
   m_PlayerHandPosition: {fileID: 696374997}
   m_PlayerGravePosition: {fileID: 45801987}
   m_PlayerTileRotation: {fileID: 952436324}
-  m_AIDeckPosition: {fileID: 0}
-  m_AIHandPosition: {fileID: 0}
-  m_AIGravePosition: {fileID: 0}
+  m_AIDeckPosition: {fileID: 2125217313}
+  m_AIHandPosition: {fileID: 1595287967}
+  m_AIGravePosition: {fileID: 353091184}
   m_AITileRotation: {fileID: 1198200946}
   m_ZoomCard: {fileID: 680650464}
   m_BtnDiscard: {fileID: 684690844}
@@ -1002,7 +1002,7 @@ GameObject:
   - component: {fileID: 655908359}
   - component: {fileID: 655908358}
   - component: {fileID: 655908357}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: BTN_Muligan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1256,7 +1256,7 @@ GameObject:
   - component: {fileID: 684690848}
   - component: {fileID: 684690847}
   - component: {fileID: 684690846}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: BTN_Discard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1491,7 +1491,7 @@ GameObject:
   - component: {fileID: 932433198}
   - component: {fileID: 932433200}
   - component: {fileID: 932433199}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Player HP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1718,7 +1718,7 @@ GameObject:
   - component: {fileID: 1100118266}
   - component: {fileID: 1100118268}
   - component: {fileID: 1100118267}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Player Mana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2001,7 +2001,7 @@ GameObject:
   - component: {fileID: 1272417790}
   - component: {fileID: 1272417792}
   - component: {fileID: 1272417791}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2144,7 +2144,7 @@ GameObject:
   - component: {fileID: 1328605319}
   - component: {fileID: 1328605321}
   - component: {fileID: 1328605320}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: AI HP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2340,7 +2340,7 @@ GameObject:
   - component: {fileID: 1343979271}
   - component: {fileID: 1343979273}
   - component: {fileID: 1343979272}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2489,7 +2489,7 @@ GameObject:
   - component: {fileID: 1460663092}
   - component: {fileID: 1460663091}
   - component: {fileID: 1460663090}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: BTN_GainMaxMana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2859,7 +2859,7 @@ GameObject:
   - component: {fileID: 1526812030}
   - component: {fileID: 1526812032}
   - component: {fileID: 1526812031}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: AI Mana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3014,7 +3014,7 @@ GameObject:
   - component: {fileID: 1561733090}
   - component: {fileID: 1561733089}
   - component: {fileID: 1561733088}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: BTN_PowerDrawCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3135,7 +3135,7 @@ GameObject:
   - component: {fileID: 1571694103}
   - component: {fileID: 1571694105}
   - component: {fileID: 1571694104}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3425,7 +3425,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1677651145}
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0.11, y: 6.3, z: 7.61}
+  m_LocalPosition: {x: 0.11, y: 7.09, z: 7.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1135032809}
@@ -3751,7 +3751,7 @@ GameObject:
   - component: {fileID: 1877145545}
   - component: {fileID: 1877145544}
   - component: {fileID: 1877145543}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3805,8 +3805,8 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 1677651148}
-  m_PlaneDistance: 1
-  m_PixelPerfect: 0
+  m_PlaneDistance: 1.39
+  m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
@@ -3916,7 +3916,7 @@ GameObject:
   - component: {fileID: 1956734258}
   - component: {fileID: 1956734260}
   - component: {fileID: 1956734259}
-  m_Layer: 5
+  m_Layer: 12
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -38,6 +38,7 @@ public class Card : MonoBehaviour
     #endregion
 
     public string m_CardName;
+    public bool m_Playable = true;
     public States m_State = States.InDeck;
     public Players m_Owner = Players.AI ;
     protected Renderer m_Renderer;
@@ -57,6 +58,12 @@ public class Card : MonoBehaviour
         m_Renderer.material.SetColor("_Color", Color.cyan);
     }
 
+    public void UnplayableCard()
+    {
+        m_Renderer.material.SetColor("_Color", Color.grey);
+        m_Playable = false;
+    }
+
     public void ValidTarget()
     {
         m_Renderer.material.SetColor("_Color", Color.red);
@@ -65,5 +72,6 @@ public class Card : MonoBehaviour
     public void UnIlluminate()
     {
         m_Renderer.material.SetColor("_Color", Color.white);
+        m_Playable = true;
     }
 }
