@@ -5,7 +5,7 @@ using UnityEngine;
 public class TileController : MonoBehaviour
 {
     public bool m_IsValid = false;
-    public bool m_IsOccupied = false;
+    public Card m_OccupiedBy = null;
     public int PosX;
     public int PosY;
 

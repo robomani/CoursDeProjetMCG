@@ -152,7 +152,7 @@ public class GameController : MonoBehaviour
 
     private bool m_PlayerAvatarActive = false;
     private bool m_WaitForMulligan = true;
-    private bool m_PlayerTurn = true;
+    private Card.Players m_PlayerTurn = Card.Players.Player;
     private int m_PlayerMana = 1;
     private int m_AIMana = 1;
     private int[] m_CardNumberByType;
@@ -212,18 +212,18 @@ public class GameController : MonoBehaviour
         m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit HitInfo;
         RaycastHit TileHitInfo;
-        if (m_PlayerTurn && !m_WaitForMulligan)
+        if (m_PlayerTurn == Card.Players.Player && !m_WaitForMulligan)
         {
             Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
             if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
             {
-                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard)
+                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn)
                 {
                     m_LastCard.UnIlluminate();
                 }
 
 
-                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay))
+                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn)
                 {
                     if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
                     {
@@ -262,7 +262,7 @@ public class GameController : MonoBehaviour
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
                 }
 
-                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>())
+                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn)
                 {
                     HitInfo.transform.GetComponent<Card>().Illuminate();
                 }
@@ -272,7 +272,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                if (m_LastCard != null && m_LastCard != m_SelectedCard)
+                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn)
                 {
                     m_LastCard.UnIlluminate();
                     m_LastCard.m_CardName = "";
@@ -294,9 +294,13 @@ public class GameController : MonoBehaviour
                     m_SelectedCard.m_State = Card.States.InPlay;
                     m_Hand[m_SelectedCard.m_Position] = null;
                     m_SelectedCard.m_Position = -1;
-                } 
+                }
+                else
+                {
+                    m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
+                }   
                 m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
-                TileHitInfo.transform.GetComponent<TileController>().m_IsOccupied = true;
+                TileHitInfo.transform.GetComponent<TileController>().m_OccupiedBy = m_SelectedCard;
                 m_BtnDiscard.SetActive(false);
                 m_SelectedCard = null;
                 ShowNormalTiles();
@@ -388,30 +392,33 @@ public class GameController : MonoBehaviour
                 x++;
             } while (x < m_SelectedCard.m_CastRange);
         }
-        else if (m_SelectedCard.m_State == Card.States.InPlay && m_SelectedCard.m_Mouvement > 0)
+        else if (m_SelectedCard.m_State == Card.States.InPlay && (m_SelectedCard.m_Mouvement > 0 || m_SelectedCard.m_AttackRange > 0))
         {
             TileController tile = null;
-            TileController selected = null;
+            TileController selected = m_SelectedCard.m_TileOccupied;
             int range = m_SelectedCard.m_Mouvement;
+            int AttackRange = m_SelectedCard.m_AttackRange;
+
 
             for (int i = 0; i < m_Board.m_Tiles.Length; i++)
             {
                 tile = m_Board.m_Tiles[i].GetComponent<TileController>();
-                selected = m_SelectedCard.m_TileOccupied;
-                if (selected.PosX + range >=  tile.PosX && selected.PosX - range <= tile.PosX)
+                
+                if ((selected.PosX + range >=  tile.PosX && selected.PosX - range <= tile.PosX) && (selected.PosY + range >= tile.PosY && selected.PosY - range <= tile.PosY))
                 {
-                    range = selected.PosX > tile.PosX ? range -= selected.PosX - tile.PosX : range -= tile.PosX - selected.PosX;
-                    if (selected.PosY + range >= tile.PosY && selected.PosY - range <= tile.PosY || (selected.PosX == tile.PosX && selected.PosY + m_SelectedCard.m_Mouvement >= tile.PosY && selected.PosY - m_SelectedCard.m_Mouvement <= tile.PosY))
+                    if (tile != selected && tile.m_OccupiedBy == null)
                     {
-                        if (tile != selected )
-                        {
-                            tile.Illuminate();
-                        }
-                    }
-                       
+                        tile.Illuminate();
+                    }                    
                 }
-            }
-            
+                if ((selected.PosX + AttackRange >= tile.PosX && selected.PosX - AttackRange <= tile.PosX) && (selected.PosY + AttackRange >= tile.PosY && selected.PosY - AttackRange <= tile.PosY))
+                {
+                    if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                    {
+                        tile.m_OccupiedBy.ValidTarget();
+                    }
+                }
+            }         
         }
     }
 
@@ -419,13 +426,17 @@ public class GameController : MonoBehaviour
     {
         for (int x = 0; x < m_Board.m_Tiles.Length; x++)
         {
-            m_Board.m_Tiles[x].GetComponent<TileController>().UnIlluminate();           
+            m_Board.m_Tiles[x].GetComponent<TileController>().UnIlluminate();
+            if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy != null)
+            {
+                m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.UnIlluminate();
+            }
         }
     }
 
     public void Cast(int i_ManaCost)
     {
-        if (m_PlayerTurn)
+        if (m_PlayerTurn == Card.Players.Player)
         {
             m_PlayerMana -= i_ManaCost;
         }
@@ -516,12 +527,20 @@ public class GameController : MonoBehaviour
 
     private GameObject AddCardToDeck( int i_Counter, int i_Position)
     {
-
-        GameObject deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
+        GameObject deckTemp = null;
+        if (m_PlayerTurn == Card.Players.Player)
+        {
+            deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
+        }
+        else
+        {
+            deckTemp = Instantiate(m_CardPrefab, m_AIDeckPosition.position, m_AIDeckPosition.rotation, m_AIDeckPosition);
+        }
         deckTemp.AddComponent(Type.GetType(m_CardTypes[i_Counter].m_ScriptToAttach));
         deckTemp.GetComponent<Card>().m_CardName = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().m_Position = i_Position;
         deckTemp.GetComponent<Card>().m_State = Card.States.InDeck;
+        deckTemp.GetComponent<Card>().m_Owner = m_PlayerTurn;
         deckTemp.name = m_CardTypes[i_Counter].m_CardTypeName;
         if (!m_RandomDeck)
         {

@@ -14,6 +14,12 @@ public class Card : MonoBehaviour
         InGrave
     }
 
+    public enum Players
+    {
+        Player,
+        AI
+    }
+
     public int m_Position;
 
     public TileController m_TileOccupied;
@@ -33,6 +39,7 @@ public class Card : MonoBehaviour
 
     public string m_CardName;
     public States m_State = States.InDeck;
+    public Players m_Owner = Players.AI ;
     protected Renderer m_Renderer;
 
     protected virtual void Awake()
@@ -48,6 +55,11 @@ public class Card : MonoBehaviour
     public void SelectedColor()
     {
         m_Renderer.material.SetColor("_Color", Color.cyan);
+    }
+
+    public void ValidTarget()
+    {
+        m_Renderer.material.SetColor("_Color", Color.red);
     }
 
     public void UnIlluminate()
