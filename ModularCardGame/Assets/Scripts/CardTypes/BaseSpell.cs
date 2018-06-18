@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Sort : Card
+public class BaseSpell : Card
 {
     
 
-    public Sort(string i_Name, int i_Position)
+    public BaseSpell(string i_Name, int i_Position)
     {
         m_CardName = i_Name;
         m_Position = i_Position;

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ombre : Card
+public class Trade : Card
 {
-    public Ombre(string i_Name, int i_Position)
+    public Trade(string i_Name, int i_Position)
     {
         m_CardName = i_Name;
         m_Position = i_Position;

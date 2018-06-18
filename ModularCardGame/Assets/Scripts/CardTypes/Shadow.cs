@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Arbaletrier : Card
+public class Shadow : Card
 {
-    public Arbaletrier(string i_Name, int i_Position)
+    public Shadow(string i_Name, int i_Position)
     {
         m_CardName = i_Name;
         m_Position = i_Position;

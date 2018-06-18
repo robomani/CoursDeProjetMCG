@@ -8,6 +8,7 @@ public class TileController : MonoBehaviour
     public Card m_OccupiedBy = null;
     public int PosX;
     public int PosY;
+    public GameObject m_AttackRangeVisual;
 
     private Renderer m_Renderer;
 
@@ -26,5 +27,16 @@ public class TileController : MonoBehaviour
     {
         m_Renderer.material.SetColor("_Color", Color.white);
         m_IsValid = false;
+        m_AttackRangeVisual.SetActive(false);
+    }
+
+    public void InAttackRange()
+    {
+        m_AttackRangeVisual.SetActive(true);       
+    }
+
+    public void ClearTile()
+    {
+        m_OccupiedBy = null;
     }
 }

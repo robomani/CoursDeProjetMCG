@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pousse : Card
+public class Push : Card
 {
-    public Pousse(string i_Name, int i_Position)
+    public Push(string i_Name, int i_Position)
     {
         m_CardName = i_Name;
         m_Position = i_Position;

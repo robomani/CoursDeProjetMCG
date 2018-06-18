@@ -21,19 +21,19 @@ public class GameController : MonoBehaviour
     #region Player Base Stats
     [Tooltip("Nombre de vie de base du joueur")]
     [SerializeField]
-    private int m_HpJoueur = 20;
+    private int m_PlayerHp = 20;
 
     [Tooltip("Le texte qui affiche le nombre de vie du joueur")]
     [SerializeField]
-    private TextMeshProUGUI m_HpJoueurText;
+    private TextMeshProUGUI m_PlayerHpText;
 
     [Tooltip("Nombre de Mana Maximum du joueur")]
     [SerializeField]
-    private int m_MaxManaJoueur = 1;
+    private int m_PlayerMaxMana = 1;
 
     [Tooltip("Le texte qui affiche le nombre de mana du joueur")]
     [SerializeField]
-    private TextMeshProUGUI m_ManaJoueurText;
+    private TextMeshProUGUI m_PlayerManaText;
     #endregion
 
     #region AI Base Stats
@@ -146,13 +146,22 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private BoardGenerator m_Board;
 
-    private GameObject[] m_Hand;
-    private GameObject[] m_Deck;
-    private GameObject[] m_Grave;
+    [SerializeField]
+    private CardsData m_CardData;
+    [SerializeField]
+    private TileController m_altar;
+
+    private GameObject[] m_PlayerHand;
+    private GameObject[] m_PlayerDeck;
+    private GameObject[] m_PlayerGrave;
+
+    private GameObject[] m_AIHand;
+    private GameObject[] m_AIDeck;
+    private GameObject[] m_AIGrave;
 
     private bool m_PlayerAvatarActive = false;
     private bool m_WaitForMulligan = true;
-    private Card.Players m_PlayerTurn = Card.Players.Player;
+    private Card.Players m_TurnOwner = Card.Players.Player;
     private int m_PlayerMana = 1;
     private int m_AIMana = 1;
     private int[] m_CardNumberByType;
@@ -169,11 +178,11 @@ public class GameController : MonoBehaviour
 
         if (m_RandomDeck)
         {
-            m_Deck = GenerateDeck(m_RandomDeckSize);
+            m_PlayerDeck = GenerateDeck(m_RandomDeckSize);
         }
         else
         {
-            m_Deck = GenerateDeck(nbrCardToAdd);
+            m_PlayerDeck = GenerateDeck(nbrCardToAdd);
         }
 
         for (int i = 0; i < 7; i++)
@@ -208,23 +217,18 @@ public class GameController : MonoBehaviour
         m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit HitInfo;
         RaycastHit TileHitInfo;
-        RaycastHit Dump;
-        if (m_PlayerTurn == Card.Players.Player && !m_WaitForMulligan)
+        if (m_TurnOwner == Card.Players.Player && !m_WaitForMulligan)
         {
             Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
-            if (Physics.Raycast(m_RayPlayerHand, out Dump, 1000f, LayerMask.GetMask("B")))
+            if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
             {
-                Debug.Log("UI");
-            }
-            else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
-            {
-                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn && m_LastCard.m_Playable)
+                if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
                 {
                     m_LastCard.UnIlluminate();
                 }
 
 
-                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn && HitInfo.transform.GetComponent<Card>().m_Playable)
+                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
                     {
@@ -237,14 +241,14 @@ public class GameController : MonoBehaviour
                         if (m_SelectedCard.m_State == Card.States.InHand)
                         {
                             m_BtnDiscard.SetActive(true);
+                            Vector3 temp = m_SelectedCard.transform.position;
+                            temp.y += 1f;
+                            temp.x -= 2.5f;
+                            temp.z -= 0.75f;
+                            m_BtnDiscard.transform.position = temp;
                         }
-                        Vector3 temp = m_SelectedCard.transform.position;
-                        temp.y += 1f;
-                        temp.x -= 2.5f;
-                        temp.z -= 0.75f;
-                        m_BtnDiscard.transform.position = temp;
                         ShowNormalTiles();
-                        ShowValidTiles();
+                        ShowValidTiles();    
                     }
                     else
                     {
@@ -255,7 +259,26 @@ public class GameController : MonoBehaviour
                     }
                     
                 }
-                
+                else if (Input.GetButtonDown("Select") && HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
+                {
+                    Debug.Log("Valid Target Selected");
+                    m_PlayerMana -= m_SelectedCard.m_ActivateCost;
+                    if (HitInfo.transform.GetComponent<Card>().LoseHp(m_SelectedCard.m_Attack))
+                    {
+                        if (HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player)
+                        {  
+                            StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_PlayerGravePosition.position, HitInfo.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
+                        }
+                        else
+                        {
+                            StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_AIGravePosition.position, HitInfo.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
+                        }
+                        HitInfo.transform.GetComponent<Card>().m_TileOccupied.ClearTile();
+                        HitInfo.transform.GetComponent<Card>().m_TileOccupied = null;
+                        HitInfo.transform.GetComponent<Card>().m_State = Card.States.InGrave;
+                    }
+                }
+
 
                 if (Input.GetButtonDown("Zoom") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay))
                 {
@@ -263,7 +286,7 @@ public class GameController : MonoBehaviour
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
                 }
 
-                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_PlayerTurn && HitInfo.transform.GetComponent<Card>().m_Playable)
+                if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     HitInfo.transform.GetComponent<Card>().Illuminate();
                 }
@@ -273,7 +296,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_PlayerTurn && m_LastCard.m_Playable)
+                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
                 {
                     m_LastCard.UnIlluminate();
                     m_LastCard.m_CardName = "";
@@ -285,11 +308,7 @@ public class GameController : MonoBehaviour
                 }
             }
 
-            if (Physics.Raycast(m_RayPlayerHand, out Dump, 1000f, LayerMask.GetMask("B")))
-            {
-                Debug.Log(Dump.transform.name);
-            }
-            else if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid )
+            if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid )
             {
                 m_TempPosition = TileHitInfo.transform.position;
                 m_TempPosition.y += 1;
@@ -297,12 +316,15 @@ public class GameController : MonoBehaviour
                 if (m_SelectedCard.m_State == Card.States.InHand)
                 {
                     m_SelectedCard.m_State = Card.States.InPlay;
-                    m_Hand[m_SelectedCard.m_Position] = null;
+                    m_PlayerHand[m_SelectedCard.m_Position] = null;
                     m_SelectedCard.m_Position = -1;
+                    m_PlayerMana -= m_SelectedCard.m_CastCost;
+                    CheckPlayableCard();
                 }
                 else
                 {
                     m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
+                    m_PlayerMana -= m_SelectedCard.m_ActivateCost;
                 }   
                 m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
                 TileHitInfo.transform.GetComponent<TileController>().m_OccupiedBy = m_SelectedCard;
@@ -320,7 +342,8 @@ public class GameController : MonoBehaviour
             { 
                 DrawCard();
                 m_PlayerMana += 10;
-                m_HpJoueur += 1;
+                m_PlayerHp += 1;
+                CheckPlayableCard();
             }
         }
         UpdateTexts();
@@ -341,28 +364,39 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public void PlayerEndTurn()
+    {
+        m_TurnOwner = Card.Players.AI;
+    }
 
+    public void PlayerStartTurn()
+    {
+        m_PlayerMana = m_PlayerMaxMana;
+        m_TurnOwner = Card.Players.Player;
+        CheckPlayableCard();
+
+    }
 
     private void UpdateTexts()
     {
-        m_HpJoueurText.text = m_HpJoueur.ToString();
-        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+        m_PlayerHpText.text = m_PlayerHp.ToString();
+        m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
         m_HpAIText.text = m_HpAI.ToString();
         m_ManaAIText.text = m_AIMana.ToString() + "/" + m_MaxManaAI.ToString();
 
         if (m_BtnPowerDrawCard.activeSelf)
         {
-            m_BtnPowerDrawCard.GetComponentInChildren<TextMeshProUGUI>().text = "Draw Cost : " + m_Hand.Count(s => s != null).ToString();
+            m_BtnPowerDrawCard.GetComponentInChildren<TextMeshProUGUI>().text = "Draw Cost : " + m_PlayerHand.Count(s => s != null).ToString();
         }
     }
 
     public void PowerDrawCard()
     {
-        if (m_PlayerMana >= m_Hand.Count(s => s != null))
+        if (m_PlayerMana >= m_PlayerHand.Count(s => s != null))
         {
-            if (m_Hand.Count(s => s == null) > 0)
+            if (m_PlayerHand.Count(s => s == null) > 0)
             {
-                Cast(m_Hand.Count(s => s != null));
+                Cast(m_PlayerHand.Count(s => s != null));
                 DrawCard();
                 ActivatePlayerAvatar();
                 CheckPlayableCard();
@@ -422,12 +456,30 @@ public class GameController : MonoBehaviour
                 }
                 if ((selected.PosX + AttackRange >= tile.PosX && selected.PosX - AttackRange <= tile.PosX) && (selected.PosY + AttackRange >= tile.PosY && selected.PosY - AttackRange <= tile.PosY))
                 {
-                    if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                    if (m_SelectedCard.m_IndirectAttack)
                     {
-                        tile.m_OccupiedBy.ValidTarget();
+                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                        {
+                            tile.m_OccupiedBy.ValidTarget();
+
+                        }
+                        tile.InAttackRange();
+                    }
+                    else if(selected.PosX == tile.PosX || selected.PosY == tile.PosY)
+                    {
+                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                        {
+                            tile.m_OccupiedBy.ValidTarget();
+
+                        }
+                        tile.InAttackRange();
                     }
                 }
-            }         
+            }
+            if(selected.PosX + AttackRange >= 6)
+            {
+                m_altar.InAttackRange();
+            }
         }
     }
 
@@ -445,7 +497,7 @@ public class GameController : MonoBehaviour
 
     public void Cast(int i_ManaCost)
     {
-        if (m_PlayerTurn == Card.Players.Player)
+        if (m_TurnOwner == Card.Players.Player)
         {
             m_PlayerMana -= i_ManaCost;
         }
@@ -453,7 +505,7 @@ public class GameController : MonoBehaviour
         {
             m_AIMana -= i_ManaCost;
         }
-        m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+        m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
 
         CheckPlayableCard();
     }
@@ -463,8 +515,8 @@ public class GameController : MonoBehaviour
         if (m_PlayerMana > 0)
         {
             m_PlayerMana = 0;
-            m_MaxManaJoueur++;
-            m_ManaJoueurText.text = m_PlayerMana.ToString() + "/" + m_MaxManaJoueur.ToString();
+            m_PlayerMaxMana++;
+            m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
         }
 
         CheckPlayableCard();
@@ -473,21 +525,21 @@ public class GameController : MonoBehaviour
     private void DrawCard()
     {
         Vector3 temp = new Vector3();
-        int indexLibre = System.Array.IndexOf(m_Hand, null);
+        int indexLibre = System.Array.IndexOf(m_PlayerHand, null);
         if (indexLibre > -1)
         {
             int i = 0;
-            while (m_Deck[i] == null)
+            while (m_PlayerDeck[i] == null)
             {
                 i++;
-                if (i >= m_Deck.Length)
+                if (i >= m_PlayerDeck.Length)
                 {
                     ShuffleGraveInDeck();
                     i = 0;
                     break;
                 }  
             }
-            m_Hand[indexLibre] = m_Deck[i];
+            m_PlayerHand[indexLibre] = m_PlayerDeck[i];
             temp = m_PlayerHandPosition.position;
             if (indexLibre == 0)
             {
@@ -500,10 +552,10 @@ public class GameController : MonoBehaviour
             {
                 temp.z -= ((indexLibre + 1) / 2) * 1.7f;
             }
-            m_Deck[i].GetComponent<Card>().m_Position = indexLibre;
-            m_Deck[i].GetComponent<Card>().m_State = Card.States.InHand;
-            m_Deck[i] = null;
-            StartCoroutine(CardMove(m_Hand[indexLibre].transform, m_PlayerDeckPosition.position, temp, m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, m_DrawTime));
+            m_PlayerDeck[i].GetComponent<Card>().m_Position = indexLibre;
+            m_PlayerDeck[i].GetComponent<Card>().m_State = Card.States.InHand;
+            m_PlayerDeck[i] = null;
+            StartCoroutine(CardMove(m_PlayerHand[indexLibre].transform, m_PlayerDeckPosition.position, temp, m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, m_DrawTime));
         }
         else
         {
@@ -515,10 +567,10 @@ public class GameController : MonoBehaviour
     {
         if (m_SelectedCard != null)
         {
-            m_Grave[System.Array.IndexOf(m_Grave, null)] = m_SelectedCard.gameObject;
+            m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = m_SelectedCard.gameObject;
             StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_PlayerGravePosition.position, m_SelectedCard.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
             m_SelectedCard.m_State = Card.States.InGrave;
-            m_Hand[m_SelectedCard.m_Position] = null;
+            m_PlayerHand[m_SelectedCard.m_Position] = null;
             m_SelectedCard = null;
             m_ZoomCard.SetActive(false);
             DrawCard();
@@ -529,9 +581,9 @@ public class GameController : MonoBehaviour
 
     public void MulliganHand()
     {
-        for (int i = 0; i < m_Hand.Length; i++)
+        for (int i = 0; i < m_PlayerHand.Length; i++)
         {
-            m_SelectedCard = m_Hand[i].GetComponent<Card>();
+            m_SelectedCard = m_PlayerHand[i].GetComponent<Card>();
             DiscardCard();
         }
         
@@ -540,7 +592,7 @@ public class GameController : MonoBehaviour
     private GameObject AddCardToDeck( int i_Counter, int i_Position)
     {
         GameObject deckTemp = null;
-        if (m_PlayerTurn == Card.Players.Player)
+        if (m_TurnOwner == Card.Players.Player)
         {
             deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
         }
@@ -552,8 +604,9 @@ public class GameController : MonoBehaviour
         deckTemp.GetComponent<Card>().m_CardName = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().m_Position = i_Position;
         deckTemp.GetComponent<Card>().m_State = Card.States.InDeck;
-        deckTemp.GetComponent<Card>().m_Owner = m_PlayerTurn;
+        deckTemp.GetComponent<Card>().m_Owner = m_TurnOwner;
         deckTemp.name = m_CardTypes[i_Counter].m_CardTypeName;
+        deckTemp.GetComponent<Card>().InitCard(m_CardData);
         if (!m_RandomDeck)
         {
             m_CardNumberByType[i_Counter] -=  1;
@@ -563,22 +616,22 @@ public class GameController : MonoBehaviour
 
     private void CheckPlayableCard()
     {
-        foreach (GameObject GO in m_Hand)
+        for (int i = 0; i < 7; i++)
         {
-            if (GO.GetComponent<Card>() && GO.GetComponent<Card>().m_CastCost > m_PlayerMana)
+            if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>().m_CastCost > m_PlayerMana)
             {
-                GO.GetComponent<Card>().UnplayableCard();
+                m_PlayerHand[i].GetComponent<Card>().UnplayableCard();
             }
-            else
+            else if(m_PlayerHand[i] != null)
             {
-                GO.GetComponent<Card>().UnIlluminate();
+                m_PlayerHand[i].GetComponent<Card>().UnIlluminate();
             }
         }
         
 
         foreach (GameObject GO in m_Board.m_Tiles)
         {
-            if (GO.GetComponent<TileController>().m_OccupiedBy != null && GO.GetComponent<TileController>().m_OccupiedBy.m_Owner == m_PlayerTurn)
+            if (GO.GetComponent<TileController>().m_OccupiedBy != null && GO.GetComponent<TileController>().m_OccupiedBy.m_Owner == m_TurnOwner)
             {
                 if (GO.GetComponent<TileController>().m_OccupiedBy.m_ActivateCost > m_PlayerMana)
                 {
@@ -595,7 +648,7 @@ public class GameController : MonoBehaviour
     private void ShuffleGraveInDeck()
     {   
         int i = 0;
-        while (m_Grave[i] != null)
+        while (m_PlayerGrave[i] != null)
         {
             i++;
         }
@@ -603,12 +656,12 @@ public class GameController : MonoBehaviour
         while (nbrCardToShuffle > 0)
         {
             int randTemp = UnityEngine.Random.Range(0, i);
-            if (m_Grave[randTemp] != null)
+            if (m_PlayerGrave[randTemp] != null)
             {
-                m_Deck[i - nbrCardToShuffle] = m_Grave[randTemp];
-                m_Grave[randTemp].GetComponent<Card>().m_State = Card.States.InDeck;
-                StartCoroutine(CardMove(m_Grave[randTemp].transform, m_PlayerGravePosition.position, m_PlayerDeckPosition.position, m_PlayerGravePosition.rotation, m_PlayerDeckPosition.rotation, m_ShuffleTime));
-                m_Grave[randTemp] = null;
+                m_PlayerDeck[i - nbrCardToShuffle] = m_PlayerGrave[randTemp];
+                m_PlayerGrave[randTemp].GetComponent<Card>().m_State = Card.States.InDeck;
+                StartCoroutine(CardMove(m_PlayerGrave[randTemp].transform, m_PlayerGravePosition.position, m_PlayerDeckPosition.position, m_PlayerGravePosition.rotation, m_PlayerDeckPosition.rotation, m_ShuffleTime));
+                m_PlayerGrave[randTemp] = null;
                 nbrCardToShuffle--;
             }
         }
@@ -617,8 +670,8 @@ public class GameController : MonoBehaviour
     private GameObject[] GenerateDeck(int i_DeckSize = 65)
     {
         GameObject[] tempDeck = new GameObject[i_DeckSize];
-        m_Grave = new GameObject[i_DeckSize];
-        m_Hand = new GameObject[m_MaxHandSize];
+        m_PlayerGrave = new GameObject[i_DeckSize];
+        m_PlayerHand = new GameObject[m_MaxHandSize];
 
         for (int i = 0; i < tempDeck.Length; i++)
         {
@@ -637,7 +690,7 @@ public class GameController : MonoBehaviour
         return tempDeck;
     }
 
-    private IEnumerator CardMove(Transform i_Card, Vector3 i_StartPos, Vector3 i_EndPos, Quaternion i_StartRot, Quaternion i_EndRot, float i_MoveTime)
+    public IEnumerator CardMove(Transform i_Card, Vector3 i_StartPos, Vector3 i_EndPos, Quaternion i_StartRot, Quaternion i_EndRot, float i_MoveTime)
     {
         float currentTime = 0f;
 
