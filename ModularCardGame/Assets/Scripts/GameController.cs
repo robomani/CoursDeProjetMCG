@@ -147,9 +147,14 @@ public class GameController : MonoBehaviour
     private BoardGenerator m_Board;
 
     [SerializeField]
+    private TextMeshPro m_ResultText;
+
+    [SerializeField]
     private CardsData m_CardData;
     [SerializeField]
-    private TileController m_altar;
+    private TileController m_AltarAI;
+    [SerializeField]
+    private TileController m_AltarPlayer;
 
     private GameObject[] m_PlayerHand;
     private GameObject[] m_PlayerDeck;
@@ -214,21 +219,51 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
+        if (m_PlayerHp <= 0)
+        {
+            m_ResultText.gameObject.SetActive(true);
+            m_ResultText.text = "You Lost";
+        }
+        else if(m_HpAI <= 0)
+        {
+            m_ResultText.gameObject.SetActive(true);
+            m_ResultText.text = "You Won";
+        }
         m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit HitInfo;
         RaycastHit TileHitInfo;
         if (m_TurnOwner == Card.Players.Player && !m_WaitForMulligan)
         {
             Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
-            if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
+            if (Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar AI")))
+            {
+                if (Input.GetButtonDown("Select") && TileHitInfo.transform.GetComponentInParent<TileController>().m_IsValidTarget && m_SelectedCard != null)
+                {
+                    ChangePlayerMana(-m_SelectedCard.m_ActivateCost);
+                    m_HpAI -= m_SelectedCard.m_Attack;
+                    m_SelectedCard.UnIlluminate();
+                    m_SelectedCard = null;
+                    ShowNormalTiles();
+                }
+            }
+            else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
             {
                 if (m_LastCard != null && m_LastCard != HitInfo.transform.GetComponent<Card>() && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
                 {
                     m_LastCard.UnIlluminate();
                 }
 
-
-                if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
+                if (Input.GetButtonDown("Select") && m_SelectedCard != null && m_SelectedCard.m_CardType == CardType.Component && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
+                {
+                    ChangePlayerMana(-m_SelectedCard.m_CastCost);
+                    HitInfo.transform.GetComponent<Card>().AddComponentCard(m_SelectedCard);
+                    m_BtnDiscard.SetActive(false);
+                    Destroy(m_SelectedCard.gameObject);
+                    m_SelectedCard = null;
+                    ShowNormalTiles();
+                    CheckPlayableCard();
+                }
+                else if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
                     {
@@ -237,7 +272,7 @@ public class GameController : MonoBehaviour
                             m_SelectedCard.UnIlluminate();
                         }
                         m_SelectedCard = HitInfo.transform.GetComponent<Card>();
-                        m_SelectedCard.SelectedColor();
+                        
                         if (m_SelectedCard.m_State == Card.States.InHand)
                         {
                             m_BtnDiscard.SetActive(true);
@@ -248,7 +283,8 @@ public class GameController : MonoBehaviour
                             m_BtnDiscard.transform.position = temp;
                         }
                         ShowNormalTiles();
-                        ShowValidTiles();    
+                        m_SelectedCard.SelectedColor();
+                        ShowValidTiles(m_SelectedCard);    
                     }
                     else
                     {
@@ -260,18 +296,18 @@ public class GameController : MonoBehaviour
                     
                 }
                 else if (Input.GetButtonDown("Select") && HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
-                {
-                    Debug.Log("Valid Target Selected");
-                    m_PlayerMana -= m_SelectedCard.m_ActivateCost;
+                {     
                     if (HitInfo.transform.GetComponent<Card>().LoseHp(m_SelectedCard.m_Attack))
                     {
                         if (HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player)
                         {  
                             StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_PlayerGravePosition.position, HitInfo.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
+                            m_AIMana -= HitInfo.transform.GetComponent<Card>().m_ActivateCost;
                         }
                         else
                         {
                             StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_AIGravePosition.position, HitInfo.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
+                            ChangePlayerMana(-m_SelectedCard.m_ActivateCost);    
                         }
                         HitInfo.transform.GetComponent<Card>().m_TileOccupied.ClearTile();
                         HitInfo.transform.GetComponent<Card>().m_TileOccupied = null;
@@ -284,12 +320,26 @@ public class GameController : MonoBehaviour
                 {
                     m_ZoomCard.SetActive(true);
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
+                    m_ZoomCard.GetComponent<Card>().CopyCard(HitInfo.transform.GetComponent<Card>());
                 }
 
                 if(m_SelectedCard != HitInfo.transform.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>() != m_ZoomCard.GetComponent<Card>() && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
-                    HitInfo.transform.GetComponent<Card>().Illuminate();
+                    if (m_SelectedCard != null && m_SelectedCard.m_CardType == CardType.Component)
+                    {
+
+                    }
+                    else
+                    {
+                        HitInfo.transform.GetComponent<Card>().Illuminate();
+                    }  
                 }
+
+                if (m_SelectedCard == null && ((HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.AI) || HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player))
+                {
+                    ShowValidTiles(HitInfo.transform.GetComponent<Card>());
+                }
+                
                               
                 m_LastCard = HitInfo.transform.GetComponent<Card>();
 
@@ -300,6 +350,11 @@ public class GameController : MonoBehaviour
                 {
                     m_LastCard.UnIlluminate();
                     m_LastCard.m_CardName = "";
+                }
+
+                if (m_SelectedCard == null)
+                {
+                    ShowNormalTiles();
                 }
 
                 if (Input.GetButtonDown("Zoom"))
@@ -318,13 +373,12 @@ public class GameController : MonoBehaviour
                     m_SelectedCard.m_State = Card.States.InPlay;
                     m_PlayerHand[m_SelectedCard.m_Position] = null;
                     m_SelectedCard.m_Position = -1;
-                    m_PlayerMana -= m_SelectedCard.m_CastCost;
-                    CheckPlayableCard();
+                    ChangePlayerMana(-m_SelectedCard.m_CastCost);
                 }
                 else
                 {
                     m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
-                    m_PlayerMana -= m_SelectedCard.m_ActivateCost;
+                    ChangePlayerMana(-m_SelectedCard.m_ActivateCost);  
                 }   
                 m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
                 TileHitInfo.transform.GetComponent<TileController>().m_OccupiedBy = m_SelectedCard;
@@ -341,12 +395,23 @@ public class GameController : MonoBehaviour
             if (Input.GetButtonDown("Cheat"))
             { 
                 DrawCard();
-                m_PlayerMana += 10;
+                ChangePlayerMana(10);
                 m_PlayerHp += 1;
-                CheckPlayableCard();
             }
         }
+
+        if (m_SelectedCard != null)
+        {
+            ShowValidTiles(m_SelectedCard);
+        }
         UpdateTexts();
+    }
+
+
+    public void ChangePlayerMana(int i_Change)
+    {
+        m_PlayerMana += i_Change;
+        CheckPlayableCard();
     }
 
     private void ActivatePlayerAvatar()
@@ -367,6 +432,39 @@ public class GameController : MonoBehaviour
     public void PlayerEndTurn()
     {
         m_TurnOwner = Card.Players.AI;
+    }
+
+    private void ShowNormalCards()
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>() != m_SelectedCard)
+            {
+                if (m_PlayerHand[i].GetComponent<Card>().m_Playable)
+                {
+                    m_PlayerHand[i].GetComponent<Card>().UnIlluminate();
+                }
+                else
+                {
+                    m_PlayerHand[i].GetComponent<Card>().UnplayableCard();
+                }
+            }
+        }
+
+        for (int i = 0; i < 15; i++)
+        {
+            if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != m_SelectedCard)
+            {
+                if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy.m_Playable)
+                {
+                    m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy.UnIlluminate();
+                }
+                else
+                {
+                    m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy.UnplayableCard();
+                }
+            }
+        }
     }
 
     public void PlayerStartTurn()
@@ -418,9 +516,27 @@ public class GameController : MonoBehaviour
         m_WaitForMulligan = false;
     }
 
-    private void ShowValidTiles()
+    private void ShowValidTiles(Card i_Card)
     {
-        if (m_SelectedCard.m_CastRange > -1 && m_SelectedCard.m_State == Card.States.InHand)
+        if (i_Card.m_CardType == CardType.Component)
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                if (m_PlayerHand[i] != null)
+                {
+                    m_PlayerHand[i].GetComponent<Card>().ValidTarget();
+                }
+            }
+
+            for (int i = 0; i < 15; i++)
+            {
+                if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != null)
+                {
+                    m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy.ValidTarget();
+                }
+            }
+        }
+        else if (i_Card.m_CastRange > -1 && i_Card.m_State == Card.States.InHand)
         {
             int x = 0;
             do
@@ -433,14 +549,14 @@ public class GameController : MonoBehaviour
                     }    
                 }
                 x++;
-            } while (x < m_SelectedCard.m_CastRange);
+            } while (x < i_Card.m_CastRange);
         }
-        else if (m_SelectedCard.m_State == Card.States.InPlay && (m_SelectedCard.m_Mouvement > 0 || m_SelectedCard.m_AttackRange > 0))
+        else if (i_Card.m_State == Card.States.InPlay && (i_Card.m_Mouvement > 0 || i_Card.m_AttackRange > 0))
         {
             TileController tile = null;
-            TileController selected = m_SelectedCard.m_TileOccupied;
-            int range = m_SelectedCard.m_Mouvement;
-            int AttackRange = m_SelectedCard.m_AttackRange;
+            TileController selected = i_Card.m_TileOccupied;
+            int range = i_Card.m_Mouvement;
+            int AttackRange = i_Card.m_AttackRange;
 
 
             for (int i = 0; i < m_Board.m_Tiles.Length; i++)
@@ -451,14 +567,21 @@ public class GameController : MonoBehaviour
                 {
                     if (tile != selected && tile.m_OccupiedBy == null)
                     {
-                        tile.Illuminate();
+                        if (i_Card.m_Owner == Card.Players.Player)
+                        {
+                            tile.Illuminate();
+                        }
+                        else
+                        {
+                            tile.EnemyIlluminate();
+                        }
                     }                    
                 }
                 if ((selected.PosX + AttackRange >= tile.PosX && selected.PosX - AttackRange <= tile.PosX) && (selected.PosY + AttackRange >= tile.PosY && selected.PosY - AttackRange <= tile.PosY))
                 {
-                    if (m_SelectedCard.m_IndirectAttack)
+                    if (i_Card.m_IndirectAttack)
                     {
-                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
                         {
                             tile.m_OccupiedBy.ValidTarget();
 
@@ -467,7 +590,7 @@ public class GameController : MonoBehaviour
                     }
                     else if(selected.PosX == tile.PosX || selected.PosY == tile.PosY)
                     {
-                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != m_SelectedCard.m_Owner)
+                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
                         {
                             tile.m_OccupiedBy.ValidTarget();
 
@@ -476,9 +599,13 @@ public class GameController : MonoBehaviour
                     }
                 }
             }
-            if(selected.PosX + AttackRange >= 6)
+            if(selected.PosX + AttackRange >= 5 && i_Card.m_Owner == Card.Players.Player)
             {
-                m_altar.InAttackRange();
+                m_AltarAI.InAttackRange();
+            }
+            else if (selected.PosX - AttackRange < 0 && i_Card.m_Owner == Card.Players.AI)
+            {
+                m_AltarPlayer.InAttackRange();
             }
         }
     }
@@ -493,13 +620,17 @@ public class GameController : MonoBehaviour
                 m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.UnIlluminate();
             }
         }
+        m_AltarAI.UnIlluminate();
+        m_AltarPlayer.UnIlluminate();
+
+        ShowNormalCards();
     }
 
     public void Cast(int i_ManaCost)
     {
         if (m_TurnOwner == Card.Players.Player)
         {
-            m_PlayerMana -= i_ManaCost;
+            ChangePlayerMana(-i_ManaCost);
         }
         else
         {
@@ -619,7 +750,7 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < 7; i++)
         {
             if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>().m_CastCost > m_PlayerMana)
-            {
+            {              
                 m_PlayerHand[i].GetComponent<Card>().UnplayableCard();
             }
             else if(m_PlayerHand[i] != null)
@@ -627,19 +758,19 @@ public class GameController : MonoBehaviour
                 m_PlayerHand[i].GetComponent<Card>().UnIlluminate();
             }
         }
-        
-
-        foreach (GameObject GO in m_Board.m_Tiles)
+        TileController temp;
+        for (int i = 0; i < 15; i++)
         {
-            if (GO.GetComponent<TileController>().m_OccupiedBy != null && GO.GetComponent<TileController>().m_OccupiedBy.m_Owner == m_TurnOwner)
+            temp = m_Board.m_Tiles[i].GetComponent<TileController>();
+            if (temp.m_OccupiedBy != null && temp.m_OccupiedBy.m_Owner == m_TurnOwner)
             {
-                if (GO.GetComponent<TileController>().m_OccupiedBy.m_ActivateCost > m_PlayerMana)
+                if (temp.m_OccupiedBy.m_ActivateCost > m_PlayerMana)
                 {
-                    GO.GetComponent<TileController>().m_OccupiedBy.UnplayableCard();
+                    temp.m_OccupiedBy.UnplayableCard();
                 }
                 else
                 {
-                    GO.GetComponent<TileController>().m_OccupiedBy.UnIlluminate();
+                    temp.m_OccupiedBy.UnIlluminate();
                 }
             }
         }

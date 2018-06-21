@@ -76,7 +76,7 @@ MonoBehaviour:
     m_IndirectAttack: 1
   - m_CardName: Crossbowman
     m_TemplateCardType: 0
-    m_CastCost: 1
+    m_CastCost: 2
     m_CastRange: 1
     m_ActivateCost: 1
     m_Attack: 1
