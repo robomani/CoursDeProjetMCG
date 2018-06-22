@@ -162,6 +162,7 @@ public class GameController : MonoBehaviour
 
     private GameObject[] m_AIHand;
     private GameObject[] m_AIDeck;
+    private List<GameObject> m_AIInPlay;
     private GameObject[] m_AIGrave;
 
     private bool m_PlayerAvatarActive = false;
@@ -170,6 +171,7 @@ public class GameController : MonoBehaviour
     private int m_PlayerMana = 1;
     private int m_AIMana = 1;
     private int[] m_CardNumberByType;
+    private int[] m_AICardNumberByType;
     private Ray m_RayPlayerHand;
     private Card m_LastCard = null;
     private Card m_SelectedCard = null;
@@ -184,15 +186,19 @@ public class GameController : MonoBehaviour
         if (m_RandomDeck)
         {
             m_PlayerDeck = GenerateDeck(m_RandomDeckSize);
+            m_AIDeck = GenerateAIDeck(m_RandomDeckSize);
         }
         else
         {
             m_PlayerDeck = GenerateDeck(nbrCardToAdd);
+            m_AIDeck = GenerateAIDeck(nbrCardToAdd);
         }
+        
 
         for (int i = 0; i < 7; i++)
         {
             DrawCard();
+            AIDrawCard();
         }
 
         CheckPlayableCard();
@@ -204,13 +210,15 @@ public class GameController : MonoBehaviour
     {
         int countCardToAdd = 0;
         int[] temp = new int[m_CardTypes.Count];
+        int[] tempAI = new int[m_CardTypes.Count];
         for (int i = 0; i < m_CardTypes.Count; i++)
         {
             countCardToAdd += m_CardTypes[i].m_NbrInDeck;
             temp[i] = m_CardTypes[i].m_NbrInDeck;
+            tempAI[i] = m_CardTypes[i].m_NbrInDeck;
         }
         m_CardNumberByType = temp;
-
+        m_AICardNumberByType = tempAI;
         UpdateTexts();
 
         return countCardToAdd;
@@ -399,6 +407,10 @@ public class GameController : MonoBehaviour
                 m_PlayerHp += 1;
             }
         }
+        else if (m_TurnOwner == Card.Players.AI && !m_WaitForMulligan)
+        {
+            
+        }
 
         if (m_SelectedCard != null)
         {
@@ -407,6 +419,169 @@ public class GameController : MonoBehaviour
         UpdateTexts();
     }
 
+
+    private IEnumerator AiTurn()
+    {
+        yield return new WaitForSeconds(m_DrawTime + 0.3f);
+        for (int i = 0; i < m_AIHand.Length; i++)
+        {
+            if (m_AIHand[i] != null && m_AIHand[i].GetComponent<Card>().m_CardType == CardType.Creature)
+            {
+                for (int x = 14; x > 11; x--)
+                {
+                    if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy == null)
+                    {
+                        m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
+                        StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                        m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
+                        m_AIHand[i].GetComponent<Card>().m_Position = -1;
+                        m_AIHand[i] = null;
+
+                        yield return new WaitForSeconds(0.5f);
+                        break;
+
+                    }
+                }
+
+            }
+            else if (m_AIHand[i] != null && m_AIHand[i].GetComponent<Card>().m_CardType == CardType.Building)
+            {
+                for (int x = 9; x < 15; x++)
+                {
+                    if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy == null)
+                    {
+                        m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
+                        StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                        m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
+                        m_AIHand[i].GetComponent<Card>().m_Position = -1;
+                        m_AIHand[i] = null;
+
+                        yield return new WaitForSeconds(0.5f);
+                        break;
+                    }
+                }
+            }
+            else if (m_AIHand[i] != null && m_AIHand[i].GetComponent<Card>().m_CardType == CardType.Component)
+            {
+                for (int x = 0; x < 15; x++)
+                {
+                    if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.AI)
+                    {
+                        if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_CardType != CardType.Building || !m_AIHand[i].GetComponent<Attack>())
+                        {
+                            StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                            yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                            m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.AddComponentCard(m_AIHand[i].GetComponent<Card>());
+                            Destroy(m_AIHand[i]);
+                            m_AIHand[i] = null;
+                            yield return new WaitForSeconds(0.5f);
+                            break;
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        for (int x = 0; x < 15; x++)
+        {
+            if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.AI)
+            {
+                //Attack une colonne plus proche du joueur si possible
+                if (m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    Card PlayerCard = m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy;
+
+                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));           
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+                //Attack une colonne plus loin du joueur si possible
+                if (m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    Card PlayerCard = m_Board.m_Tiles[Mathf.Max(x + 3, 0)].GetComponent<TileController>().m_OccupiedBy;
+
+                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+                //Attack une ligne plus haut si possible
+                if (x%3 != 0 &&  m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    Card PlayerCard = m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy;
+
+                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+                //Attack une ligne plus bas si possible
+                if ((x + 1) % 3 != 0 && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    Card PlayerCard = m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy;
+
+                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+                //Bouge vers le joueur si possible
+                if (m_Board.m_Tiles[Mathf.Max(x-3, 0)].GetComponent<TileController>().m_OccupiedBy == null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_CardType == CardType.Creature)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy = AiCard;
+                    AiCard = null;
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+
+            }
+        }
+        EndTurn();
+    }
+
+    public void EndTurn()
+    {
+        if (m_TurnOwner == Card.Players.Player)
+        {
+            m_TurnOwner = Card.Players.AI;
+            m_AIMana = m_MaxManaAI;
+            AIDrawCard();
+            StartCoroutine(AiTurn());
+        }
+        else
+	    {
+            m_TurnOwner = Card.Players.Player;
+            m_PlayerMana = m_PlayerMaxMana;
+            DrawCard();
+            CheckPlayableCard();
+        }
+    }
 
     public void ChangePlayerMana(int i_Change)
     {
@@ -427,11 +602,6 @@ public class GameController : MonoBehaviour
             m_BtnGainMaxMana.SetActive(true);
             m_BtnPowerDrawCard.SetActive(true);
         }
-    }
-
-    public void PlayerEndTurn()
-    {
-        m_TurnOwner = Card.Players.AI;
     }
 
     private void ShowNormalCards()
@@ -694,6 +864,47 @@ public class GameController : MonoBehaviour
         } 
     }
 
+    private void AIDrawCard()
+    {
+        Vector3 temp = new Vector3();
+        int indexLibre = System.Array.IndexOf(m_AIHand, null);
+        if (indexLibre > -1)
+        {
+            int i = 0;
+            while (m_AIDeck[i] == null)
+            {
+                i++;
+                if (i >= m_AIDeck.Length)
+                {
+                    ShuffleGraveInDeck();
+                    i = 0;
+                    break;
+                }
+            }
+            m_AIHand[indexLibre] = m_AIDeck[i];
+            temp = m_AIHandPosition.position;
+            if (indexLibre == 0)
+            {
+            }
+            else if (indexLibre % 2 == 0)
+            {
+                temp.z += (indexLibre / 2) * 1.7f;
+            }
+            else
+            {
+                temp.z -= ((indexLibre + 1) / 2) * 1.7f;
+            }
+            m_AIDeck[i].GetComponent<Card>().m_Position = indexLibre;
+            m_AIDeck[i].GetComponent<Card>().m_State = Card.States.InHand;
+            m_AIDeck[i] = null;
+            StartCoroutine(CardMove(m_AIHand[indexLibre].transform, m_AIDeckPosition.position, temp, m_AIDeckPosition.rotation, m_AIHandPosition.rotation, m_DrawTime));
+        }
+        else
+        {
+            Debug.Log("Main pleine");
+        }
+    }
+
     public void DiscardCard()
     {
         if (m_SelectedCard != null)
@@ -720,10 +931,10 @@ public class GameController : MonoBehaviour
         
     }
 
-    private GameObject AddCardToDeck( int i_Counter, int i_Position)
+    private GameObject AddCardToDeck( int i_Counter, int i_Position, Card.Players i_Player )
     {
         GameObject deckTemp = null;
-        if (m_TurnOwner == Card.Players.Player)
+        if (i_Player == Card.Players.Player)
         {
             deckTemp = Instantiate(m_CardPrefab, m_PlayerDeckPosition.position, m_PlayerDeckPosition.rotation, m_PlayerDeckPosition);
         }
@@ -735,7 +946,7 @@ public class GameController : MonoBehaviour
         deckTemp.GetComponent<Card>().m_CardName = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().m_Position = i_Position;
         deckTemp.GetComponent<Card>().m_State = Card.States.InDeck;
-        deckTemp.GetComponent<Card>().m_Owner = m_TurnOwner;
+        deckTemp.GetComponent<Card>().m_Owner  = i_Player;
         deckTemp.name = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().InitCard(m_CardData);
         if (!m_RandomDeck)
@@ -809,7 +1020,7 @@ public class GameController : MonoBehaviour
             float randTemp = UnityEngine.Random.Range(0,m_CardTypes.Count);
             if (m_CardNumberByType[(int)randTemp] > 0)
             {
-                tempDeck[i] = AddCardToDeck((int)randTemp,i);
+                tempDeck[i] = AddCardToDeck((int)randTemp,i, Card.Players.Player);
                 tempDeck[i].GetComponent<Renderer>().material = m_CardTypes[(int)randTemp].m_CardTypeSkin;
             }
             else
@@ -819,6 +1030,48 @@ public class GameController : MonoBehaviour
         }
 
         return tempDeck;
+    }
+
+    private GameObject[] GenerateAIDeck(int i_DeckSize = 65)
+    {
+        GameObject[] tempAIDeck = new GameObject[i_DeckSize];
+        m_AIGrave = new GameObject[i_DeckSize];
+        m_AIHand = new GameObject[m_MaxHandSize];
+
+        for (int i = 0; i < tempAIDeck.Length; i++)
+        {
+            float randTemp = UnityEngine.Random.Range(0, 3);
+            int cardToAdd = 0;
+            switch ((int)randTemp)
+            {
+                case 0:
+                    cardToAdd = 0;
+                    break;
+                case 1:
+                    cardToAdd = 5;
+                    break;
+                case 2:
+                    cardToAdd = 7;
+                    break;
+                case 3:
+                    cardToAdd = 8;
+                    break;
+                default:
+                    break;
+            }
+
+            if (m_AICardNumberByType[cardToAdd] > 0)
+            {
+                tempAIDeck[i] = AddCardToDeck(cardToAdd, i, Card.Players.AI);
+                tempAIDeck[i].GetComponent<Renderer>().material = m_CardTypes[cardToAdd].m_CardTypeSkin;
+            }
+            else
+            {
+                i--;
+            }
+        }
+
+        return tempAIDeck;
     }
 
     public IEnumerator CardMove(Transform i_Card, Vector3 i_StartPos, Vector3 i_EndPos, Quaternion i_StartRot, Quaternion i_EndRot, float i_MoveTime)
