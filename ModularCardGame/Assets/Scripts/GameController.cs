@@ -867,12 +867,13 @@ public class GameController : MonoBehaviour
 
     public void RaiseMaxPlayerMana()
     {
-        if (m_PlayerMana > 0)
+        if (m_PlayerMana >= m_PlayerMaxMana)
         {
             m_PlayerMana = 0;
             m_PlayerMaxMana++;
             m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
         }
+        
 
         CheckPlayableCard();
     }
@@ -969,6 +970,7 @@ public class GameController : MonoBehaviour
             m_PlayerHand[m_SelectedCard.m_Position] = null;
             m_SelectedCard = null;
             m_ZoomCard.SetActive(false);
+            ChangePlayerMana(-1);
             DrawCard();
             ShowNormalTiles();
         }
