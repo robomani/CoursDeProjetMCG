@@ -1565,6 +1565,7 @@ MonoBehaviour:
   m_BtnDiscard: {fileID: 684690844}
   m_BtnGainMaxMana: {fileID: 1460663088}
   m_BtnPowerDrawCard: {fileID: 1561733086}
+  m_BtnEndTurn: {fileID: 1442774686}
   m_CardTypes:
   - m_CardTypeName: Solder
     m_NbrInDeck: 10
@@ -3731,6 +3732,17 @@ MonoBehaviour:
       - m_Target: {fileID: 487679856}
         m_MethodName: EndTurn
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1442774686}
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

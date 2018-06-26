@@ -63,5 +63,6 @@ public class TileController : MonoBehaviour
     public void ClearTile()
     {
         m_OccupiedBy = null;
+        Debug.Log("Clear tile");
     }
 }

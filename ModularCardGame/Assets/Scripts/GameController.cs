@@ -122,6 +122,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Le bouton qui augmente la mana maximum du joueur")]
     [SerializeField]
     private GameObject m_BtnPowerDrawCard;
+
+    [Tooltip("Le bouton qui fini le tour du joueur")]
+    [SerializeField]
+    private GameObject m_BtnEndTurn;
     #endregion
 
     [Tooltip("Liste des types de cartes à placer dans les decks")]
@@ -167,6 +171,7 @@ public class GameController : MonoBehaviour
 
     private bool m_PlayerAvatarActive = false;
     private bool m_WaitForMulligan = true;
+    private bool m_TurnAI = false;
     private Card.Players m_TurnOwner = Card.Players.Player;
     private int m_PlayerMana = 1;
     private int m_AIMana = 1;
@@ -304,23 +309,8 @@ public class GameController : MonoBehaviour
                     
                 }
                 else if (Input.GetButtonDown("Select") && HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
-                {     
-                    if (HitInfo.transform.GetComponent<Card>().LoseHp(m_SelectedCard.m_Attack))
-                    {
-                        if (HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player)
-                        {  
-                            StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_PlayerGravePosition.position, HitInfo.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
-                            m_AIMana -= HitInfo.transform.GetComponent<Card>().m_ActivateCost;
-                        }
-                        else
-                        {
-                            StartCoroutine(CardMove(HitInfo.transform, HitInfo.transform.position, m_AIGravePosition.position, HitInfo.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
-                            ChangePlayerMana(-m_SelectedCard.m_ActivateCost);    
-                        }
-                        HitInfo.transform.GetComponent<Card>().m_TileOccupied.ClearTile();
-                        HitInfo.transform.GetComponent<Card>().m_TileOccupied = null;
-                        HitInfo.transform.GetComponent<Card>().m_State = Card.States.InGrave;
-                    }
+                {
+                    AttackCard(m_SelectedCard, HitInfo.transform.GetComponent<Card>());
                 }
 
 
@@ -393,6 +383,7 @@ public class GameController : MonoBehaviour
                 m_BtnDiscard.SetActive(false);
                 m_SelectedCard = null;
                 ShowNormalTiles();
+                CheckPlayableCard();
             }
 
             if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_PlayerMana > 0)
@@ -420,6 +411,43 @@ public class GameController : MonoBehaviour
     }
 
 
+    private void AttackCard(Card i_Attacker, Card i_Target)
+    {
+        if (i_Target.LoseHp(i_Attacker.m_Attack))
+        {
+            if (i_Target.m_Owner == Card.Players.Player)
+            {
+                StartCoroutine(CardMove(i_Target.transform, i_Target.transform.position, m_PlayerGravePosition.position, i_Target.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
+                m_AIMana -= i_Attacker.m_ActivateCost;
+                m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = i_Target.gameObject;
+            }
+            else
+            {
+                StartCoroutine(CardMove(i_Target.transform, i_Target.transform.position, m_AIGravePosition.position, i_Target.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
+                ChangePlayerMana(-i_Attacker.m_ActivateCost);
+                m_AIGrave[System.Array.IndexOf(m_AIGrave, null)] = i_Target.gameObject;
+                m_SelectedCard = null;
+                ShowNormalTiles();
+
+            }
+
+            i_Target.m_TileOccupied.ClearTile();
+            i_Target.m_TileOccupied = null;
+            i_Target.m_State = Card.States.InGrave;
+        }
+        else
+        {
+            if (m_TurnAI)
+            {
+                m_AIMana -= i_Attacker.m_ActivateCost;
+            }
+            else
+            {
+                ChangePlayerMana(-i_Attacker.m_ActivateCost);
+            }
+        }
+    }
+
     private IEnumerator AiTurn()
     {
         yield return new WaitForSeconds(m_DrawTime + 0.3f);
@@ -432,6 +460,7 @@ public class GameController : MonoBehaviour
                     if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy == null)
                     {
                         m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
+                        m_AIHand[i].GetComponent<Card>().m_TileOccupied = m_Board.m_Tiles[x].GetComponent<TileController>();
                         StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                         m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
                         m_AIHand[i].GetComponent<Card>().m_Position = -1;
@@ -451,6 +480,7 @@ public class GameController : MonoBehaviour
                     if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy == null)
                     {
                         m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
+                        m_AIHand[i].GetComponent<Card>().m_TileOccupied = m_Board.m_Tiles[x].GetComponent<TileController>();
                         StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                         m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
                         m_AIHand[i].GetComponent<Card>().m_Position = -1;
@@ -485,7 +515,7 @@ public class GameController : MonoBehaviour
 
         for (int x = 0; x < 15; x++)
         {
-            if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.AI)
+            if (m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.AI && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_CardType == CardType.Creature)
             {
                 //Attack une colonne plus proche du joueur si possible
                 if (m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
@@ -493,67 +523,84 @@ public class GameController : MonoBehaviour
                     Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
                     Card PlayerCard = m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy;
 
-                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));           
-                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    //StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));           
+                    //yield return new WaitForSeconds(m_DiscardTime + 0.2f);
                     StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                     yield return new WaitForSeconds(m_DiscardTime + 0.2f);
-                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    AttackCard(AiCard, PlayerCard);
+                    yield return new WaitForSeconds(0.5f);
+                    break;
+                }
+
+                //Attack l'avatar du joueur si possible
+                else if (x - 3 < 0)
+                {
+                    Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
+                    TileController PlayerAvatar = m_AltarPlayer;
+
+                    //StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerAvatar.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    //yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    StartCoroutine(CardMove(AiCard.transform, PlayerAvatar.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    m_PlayerHp -= AiCard.m_Attack;
                     yield return new WaitForSeconds(0.5f);
                     break;
                 }
 
                 //Attack une colonne plus loin du joueur si possible
-                if (m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                else if (m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[Mathf.Min(x + 3, 14)].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
                 {
                     Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
                     Card PlayerCard = m_Board.m_Tiles[Mathf.Max(x + 3, 0)].GetComponent<TileController>().m_OccupiedBy;
 
-                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    //StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    // return new WaitForSeconds(m_DiscardTime + 0.2f);
                     StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                     yield return new WaitForSeconds(m_DiscardTime + 0.2f);
-                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    AttackCard(AiCard, PlayerCard);
                     yield return new WaitForSeconds(0.5f);
                     break;
                 }
 
                 //Attack une ligne plus haut si possible
-                if (x%3 != 0 &&  m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                else if (x%3 != 0 &&  m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
                 {
                     Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
                     Card PlayerCard = m_Board.m_Tiles[x - 1].GetComponent<TileController>().m_OccupiedBy;
 
-                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    //StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    //yield return new WaitForSeconds(m_DiscardTime + 0.2f);
                     StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                     yield return new WaitForSeconds(m_DiscardTime + 0.2f);
-                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    AttackCard(AiCard, PlayerCard);
                     yield return new WaitForSeconds(0.5f);
                     break;
                 }
 
                 //Attack une ligne plus bas si possible
-                if ((x + 1) % 3 != 0 && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
+                else if ((x + 1) % 3 != 0 && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy.m_Owner == Card.Players.Player)
                 {
                     Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
                     Card PlayerCard = m_Board.m_Tiles[x + 1].GetComponent<TileController>().m_OccupiedBy;
 
-                    StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                    yield return new WaitForSeconds(m_DiscardTime + 0.2f);
+                    //StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, PlayerCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    //yield return new WaitForSeconds(m_DiscardTime + 0.2f);
                     StartCoroutine(CardMove(AiCard.transform, PlayerCard.transform.position, AiCard.transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                     yield return new WaitForSeconds(m_DiscardTime + 0.2f);
-                    PlayerCard.LoseHp(AiCard.m_Attack);
+                    AttackCard(AiCard, PlayerCard);
                     yield return new WaitForSeconds(0.5f);
                     break;
                 }
 
                 //Bouge vers le joueur si possible
-                if (m_Board.m_Tiles[Mathf.Max(x-3, 0)].GetComponent<TileController>().m_OccupiedBy == null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_CardType == CardType.Creature)
+                else if (x-3 >= 0 && m_Board.m_Tiles[x-3].GetComponent<TileController>().m_OccupiedBy == null && m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy.m_CardType == CardType.Creature)
                 {
                     Card AiCard = m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy;
                     StartCoroutine(CardMove(AiCard.transform, AiCard.transform.position, m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().transform.position, m_PlayerTileRotation.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
                     yield return new WaitForSeconds(m_DiscardTime + 0.2f);
                     m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>().m_OccupiedBy = AiCard;
+                    m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = null;
+                    AiCard.m_TileOccupied = m_Board.m_Tiles[Mathf.Max(x - 3, 0)].GetComponent<TileController>();
                     AiCard = null;
                     yield return new WaitForSeconds(0.5f);
                     break;
@@ -562,20 +609,27 @@ public class GameController : MonoBehaviour
 
             }
         }
+        m_TurnAI = false;
         EndTurn();
     }
 
     public void EndTurn()
     {
-        if (m_TurnOwner == Card.Players.Player)
+        if (m_TurnAI)
+        {
+
+        }
+        else if (m_TurnOwner == Card.Players.Player)
         {
             m_TurnOwner = Card.Players.AI;
             m_AIMana = m_MaxManaAI;
             AIDrawCard();
+            m_TurnAI = true;
             StartCoroutine(AiTurn());
         }
         else
 	    {
+            m_BtnEndTurn.SetActive(true);
             m_TurnOwner = Card.Players.Player;
             m_PlayerMana = m_PlayerMaxMana;
             DrawCard();
@@ -692,7 +746,7 @@ public class GameController : MonoBehaviour
         {
             for (int i = 0; i < 7; i++)
             {
-                if (m_PlayerHand[i] != null)
+                if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>() != i_Card)
                 {
                     m_PlayerHand[i].GetComponent<Card>().ValidTarget();
                 }
