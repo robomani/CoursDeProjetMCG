@@ -221,6 +221,7 @@ public class Card : MonoBehaviour
         {
             return true;
         }
+        UpdateStatsOnCard();
         return false;
     }
 
