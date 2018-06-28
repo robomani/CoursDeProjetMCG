@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-
 public class Card : MonoBehaviour
 {
 
@@ -21,6 +20,8 @@ public class Card : MonoBehaviour
         Player,
         AI
     }
+
+
 
     public int m_Position;
 
@@ -63,14 +64,31 @@ public class Card : MonoBehaviour
     public string m_CardName;
     public bool m_Playable = true;
     public bool m_ValidTarget = false;
-    public States m_State = States.InDeck;
+    
     public Players m_Owner = Players.AI ;
     public TextMeshPro m_CostText;
     public TextMeshPro m_AttackText;
     public TextMeshPro m_HpText;
     public TextMeshPro m_MoveText;
+    public GameObject m_CharacterPrefab;
 
+    protected States m_State = States.InDeck;
+    protected Transform m_SpawnPoint;
+    protected GameObject m_Character;
     protected Renderer m_Renderer;
+    #region Getters
+    public Transform SpawnPoint
+    {
+        get { return m_SpawnPoint; }
+    }
+
+    public States State
+    {
+        get { return m_State; }
+    }
+
+    #endregion
+
 
     protected virtual void Awake()
     {
@@ -94,7 +112,17 @@ public class Card : MonoBehaviour
             {
                 m_MoveText = TM;
             }
-        } 
+        }
+
+        Transform[] tempTransform = GetComponentsInChildren<Transform>();
+        foreach (Transform TR in tempTransform)
+        {
+            if (TR.name == "SpawnPoint")
+            {
+                m_SpawnPoint = TR;
+            }    
+        }
+            
     }
 
     protected void Start()
@@ -151,7 +179,7 @@ public class Card : MonoBehaviour
         }
     }
 
-    public void UpdateStatsOnCard()
+    protected void UpdateStatsOnCard()
     {
         if (m_CardType == CardType.Component)
         {
@@ -328,5 +356,52 @@ public class Card : MonoBehaviour
         m_Renderer.material.SetColor("_Color", Color.white);
         m_Playable = true;
         m_ValidTarget = false;
+    }
+
+    public void ChangeState(States i_State)
+    {
+        
+
+        if (i_State != m_State)
+        {
+            m_State = i_State;
+            if (m_State == States.InPlay)
+            {
+                SpawnCharacter();
+            }
+            else
+            {
+                DestroyCharacter();
+            }
+        }
+    }
+
+    protected void SpawnCharacter()
+    {
+        if (m_Character == null && m_CharacterPrefab != null)
+        {
+            m_Character = Instantiate(m_CharacterPrefab, m_SpawnPoint.position, m_SpawnPoint.rotation, transform);
+        }
+        else if(m_Character != null)
+        {
+            Debug.Log("This card already has a character instance");
+        }
+        else
+        {
+            Debug.Log("This card already no character prefab to Instantiate");
+        }
+    }
+
+    protected void DestroyCharacter()
+    {
+        if (m_Character != null)
+        {
+            Destroy(m_Character);
+            m_Character = null;
+        }
+        else
+        {
+            Debug.Log("This card do not have a character instance to destroy");
+        }
     }
 }

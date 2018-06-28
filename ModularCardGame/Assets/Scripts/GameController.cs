@@ -276,7 +276,7 @@ public class GameController : MonoBehaviour
                     ShowNormalTiles();
                     CheckPlayableCard();
                 }
-                else if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
+                else if (Input.GetButtonDown("Select") && (HitInfo.transform.GetComponent<Card>().State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().State == Card.States.InPlay) && HitInfo.transform.GetComponent<Card>().m_Owner == m_TurnOwner && HitInfo.transform.GetComponent<Card>().m_Playable)
                 {
                     if (m_SelectedCard != HitInfo.transform.GetComponent<Card>())
                     {
@@ -286,7 +286,7 @@ public class GameController : MonoBehaviour
                         }
                         m_SelectedCard = HitInfo.transform.GetComponent<Card>();
                         
-                        if (m_SelectedCard.m_State == Card.States.InHand)
+                        if (m_SelectedCard.State == Card.States.InHand)
                         {
                             m_BtnDiscard.SetActive(true);
                             Vector3 temp = m_SelectedCard.transform.position;
@@ -308,13 +308,13 @@ public class GameController : MonoBehaviour
                     }
                     
                 }
-                else if (Input.GetButtonDown("Select") && HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
+                else if (Input.GetButtonDown("Select") && HitInfo.transform.GetComponent<Card>().State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_ValidTarget)
                 {
                     AttackCard(m_SelectedCard, HitInfo.transform.GetComponent<Card>());
                 }
 
 
-                if (Input.GetButtonDown("Zoom") && (HitInfo.transform.GetComponent<Card>().m_State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay))
+                if (Input.GetButtonDown("Zoom") && (HitInfo.transform.GetComponent<Card>().State == Card.States.InHand || HitInfo.transform.GetComponent<Card>().State == Card.States.InPlay))
                 {
                     m_ZoomCard.SetActive(true);
                     m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
@@ -333,7 +333,7 @@ public class GameController : MonoBehaviour
                     }  
                 }
 
-                if (m_SelectedCard == null && ((HitInfo.transform.GetComponent<Card>().m_State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.AI) || HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player))
+                if (m_SelectedCard == null && ((HitInfo.transform.GetComponent<Card>().State == Card.States.InPlay && HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.AI) || HitInfo.transform.GetComponent<Card>().m_Owner == Card.Players.Player))
                 {
                     ShowValidTiles(HitInfo.transform.GetComponent<Card>());
                 }
@@ -366,9 +366,9 @@ public class GameController : MonoBehaviour
                 m_TempPosition = TileHitInfo.transform.position;
                 m_TempPosition.y += 1;
                 StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                if (m_SelectedCard.m_State == Card.States.InHand)
+                if (m_SelectedCard.State == Card.States.InHand)
                 {
-                    m_SelectedCard.m_State = Card.States.InPlay;
+                    m_SelectedCard.ChangeState(Card.States.InPlay);
                     m_PlayerHand[m_SelectedCard.m_Position] = null;
                     m_SelectedCard.m_Position = -1;
                     ChangePlayerMana(-m_SelectedCard.m_CastCost);
@@ -433,7 +433,7 @@ public class GameController : MonoBehaviour
 
             i_Target.m_TileOccupied.ClearTile();
             i_Target.m_TileOccupied = null;
-            i_Target.m_State = Card.States.InGrave;
+            i_Target.ChangeState(Card.States.InGrave);
         }
         else
         {
@@ -462,7 +462,7 @@ public class GameController : MonoBehaviour
                         m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
                         m_AIHand[i].GetComponent<Card>().m_TileOccupied = m_Board.m_Tiles[x].GetComponent<TileController>();
                         StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                        m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
+                        m_AIHand[i].GetComponent<Card>().ChangeState(Card.States.InPlay);
                         m_AIHand[i].GetComponent<Card>().m_Position = -1;
                         m_AIHand[i] = null;
 
@@ -482,7 +482,7 @@ public class GameController : MonoBehaviour
                         m_Board.m_Tiles[x].GetComponent<TileController>().m_OccupiedBy = m_AIHand[i].GetComponent<Card>();
                         m_AIHand[i].GetComponent<Card>().m_TileOccupied = m_Board.m_Tiles[x].GetComponent<TileController>();
                         StartCoroutine(CardMove(m_AIHand[i].transform, m_AIHand[i].transform.position, m_Board.m_Tiles[x].transform.position, m_AIHand[i].transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                        m_AIHand[i].GetComponent<Card>().m_State = Card.States.InPlay;
+                        m_AIHand[i].GetComponent<Card>().ChangeState(Card.States.InPlay);
                         m_AIHand[i].GetComponent<Card>().m_Position = -1;
                         m_AIHand[i] = null;
 
@@ -760,7 +760,7 @@ public class GameController : MonoBehaviour
                 }
             }
         }
-        else if (i_Card.m_CastRange > -1 && i_Card.m_State == Card.States.InHand)
+        else if (i_Card.m_CastRange > -1 && i_Card.State == Card.States.InHand)
         {
             int x = 0;
             do
@@ -775,7 +775,7 @@ public class GameController : MonoBehaviour
                 x++;
             } while (x < i_Card.m_CastRange);
         }
-        else if (i_Card.m_State == Card.States.InPlay && (i_Card.m_Mouvement > 0 || i_Card.m_AttackRange > 0))
+        else if (i_Card.State == Card.States.InPlay && (i_Card.m_Mouvement > 0 || i_Card.m_AttackRange > 0))
         {
             TileController tile = null;
             TileController selected = i_Card.m_TileOccupied;
@@ -909,7 +909,7 @@ public class GameController : MonoBehaviour
                 temp.z -= ((indexLibre + 1) / 2) * 1.7f;
             }
             m_PlayerDeck[i].GetComponent<Card>().m_Position = indexLibre;
-            m_PlayerDeck[i].GetComponent<Card>().m_State = Card.States.InHand;
+            m_PlayerDeck[i].GetComponent<Card>().ChangeState(Card.States.InHand);
             m_PlayerDeck[i] = null;
             StartCoroutine(CardMove(m_PlayerHand[indexLibre].transform, m_PlayerDeckPosition.position, temp, m_PlayerDeckPosition.rotation, m_PlayerHandPosition.rotation, m_DrawTime));
         }
@@ -950,7 +950,7 @@ public class GameController : MonoBehaviour
                 temp.z -= ((indexLibre + 1) / 2) * 1.7f;
             }
             m_AIDeck[i].GetComponent<Card>().m_Position = indexLibre;
-            m_AIDeck[i].GetComponent<Card>().m_State = Card.States.InHand;
+            m_AIDeck[i].GetComponent<Card>().ChangeState(Card.States.InHand);
             m_AIDeck[i] = null;
             StartCoroutine(CardMove(m_AIHand[indexLibre].transform, m_AIDeckPosition.position, temp, m_AIDeckPosition.rotation, m_AIHandPosition.rotation, m_DrawTime));
         }
@@ -966,7 +966,7 @@ public class GameController : MonoBehaviour
         {
             m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = m_SelectedCard.gameObject;
             StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_PlayerGravePosition.position, m_SelectedCard.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
-            m_SelectedCard.m_State = Card.States.InGrave;
+            m_SelectedCard.ChangeState(Card.States.InGrave);
             m_PlayerHand[m_SelectedCard.m_Position] = null;
             m_SelectedCard = null;
             m_ZoomCard.SetActive(false);
@@ -983,6 +983,7 @@ public class GameController : MonoBehaviour
         {
             m_SelectedCard = m_PlayerHand[i].GetComponent<Card>();
             DiscardCard();
+            ChangePlayerMana(1);
         }
         
     }
@@ -1001,7 +1002,7 @@ public class GameController : MonoBehaviour
         deckTemp.AddComponent(Type.GetType(m_CardTypes[i_Counter].m_ScriptToAttach));
         deckTemp.GetComponent<Card>().m_CardName = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().m_Position = i_Position;
-        deckTemp.GetComponent<Card>().m_State = Card.States.InDeck;
+        deckTemp.GetComponent<Card>().ChangeState(Card.States.InDeck);
         deckTemp.GetComponent<Card>().m_Owner  = i_Player;
         deckTemp.name = m_CardTypes[i_Counter].m_CardTypeName;
         deckTemp.GetComponent<Card>().InitCard(m_CardData);
@@ -1057,7 +1058,7 @@ public class GameController : MonoBehaviour
             if (m_PlayerGrave[randTemp] != null)
             {
                 m_PlayerDeck[i - nbrCardToShuffle] = m_PlayerGrave[randTemp];
-                m_PlayerGrave[randTemp].GetComponent<Card>().m_State = Card.States.InDeck;
+                m_PlayerGrave[randTemp].GetComponent<Card>().ChangeState(Card.States.InDeck);
                 StartCoroutine(CardMove(m_PlayerGrave[randTemp].transform, m_PlayerGravePosition.position, m_PlayerDeckPosition.position, m_PlayerGravePosition.rotation, m_PlayerDeckPosition.rotation, m_ShuffleTime));
                 m_PlayerGrave[randTemp] = null;
                 nbrCardToShuffle--;
@@ -1137,6 +1138,13 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         float value;
 
+        LookFoward CharPos = null;
+
+        if (i_Card.GetComponentInChildren<LookFoward>())
+        {
+            CharPos = i_Card.GetComponentInChildren<LookFoward>();
+        }
+
         while (currentTime != i_MoveTime)
         {
             currentTime += Time.deltaTime;
@@ -1148,8 +1156,18 @@ public class GameController : MonoBehaviour
             value = currentTime / i_MoveTime;
             i_Card.position = Vector3.Lerp(i_StartPos, i_EndPos, value);
             i_Card.rotation = Quaternion.Slerp(i_StartRot, i_EndRot, value);
+            if (CharPos != null)
+            {
+                CharPos.UpdatePos(i_Card.GetComponent<Card>().SpawnPoint.position);
+            }
             yield return new WaitForEndOfFrame();
         }
+
+        if (CharPos != null)
+        {
+            CharPos.UpdatePos(i_Card.GetComponent<Card>().SpawnPoint.position);
+        }
         currentTime = 0f;
+        
     }
 }

@@ -449,11 +449,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4440412475997544, guid: 8edf6afd47eea964dadb19d3479a410b,
     type: 2}
   m_PrefabInternal: {fileID: 1515484971}
---- !u!1 &142238213 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1768424393052638, guid: 39de29ee986ba0749abc188388beff94,
-    type: 2}
-  m_PrefabInternal: {fileID: 1340991040}
 --- !u!1 &146571552
 GameObject:
   m_ObjectHideFlags: 0
@@ -1623,8 +1618,8 @@ MonoBehaviour:
     m_NbrInDeck: 0
     m_CardTypeSkin: {fileID: 2100000, guid: 43b82f2c5abd8a6418d3fbbe38753cc2, type: 2}
     m_ScriptToAttach: Shadow
-  m_RandomDeckSize: 20
-  m_RandomDeck: 0
+  m_RandomDeckSize: 10
+  m_RandomDeck: 1
   m_MaxHandSize: 7
   m_Board: {fileID: 1135032808}
   m_ResultText: {fileID: 178262879}
@@ -2156,12 +2151,12 @@ MonoBehaviour:
   m_CardName: 
   m_Playable: 1
   m_ValidTarget: 0
-  m_State: 0
   m_Owner: 1
   m_CostText: {fileID: 1241014843}
   m_AttackText: {fileID: 1817359548}
   m_HpText: {fileID: 1936554854}
   m_MoveText: {fileID: 146571554}
+  m_CharacterPrefab: {fileID: 0}
 --- !u!65 &695925546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3477,31 +3472,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 16
       objectReference: {fileID: 0}
-    - target: {fileID: 114739136010438350, guid: 39de29ee986ba0749abc188388beff94,
-        type: 2}
-      propertyPath: m_Avatar
-      value: 
-      objectReference: {fileID: 142238213}
-    - target: {fileID: 1299299510698574, guid: 39de29ee986ba0749abc188388beff94, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1619780455808234, guid: 39de29ee986ba0749abc188388beff94, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1041474217756060, guid: 39de29ee986ba0749abc188388beff94, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1772706811933268, guid: 39de29ee986ba0749abc188388beff94, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1768424393052638, guid: 39de29ee986ba0749abc188388beff94, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39de29ee986ba0749abc188388beff94, type: 2}
   m_IsPrefabParent: 0
@@ -4142,26 +4112,6 @@ Prefab:
     - target: {fileID: 4338086617071380, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
       propertyPath: m_RootOrder
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1776296191712230, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1476752509431714, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1351267827417516, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1343265244235936, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256718614119460, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a579cc81db251a54fafd86d8bb49f57d, type: 2}

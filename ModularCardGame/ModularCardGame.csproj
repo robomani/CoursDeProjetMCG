@@ -308,6 +308,7 @@
     <Compile Include="Assets\Scripts\CardTypes\Trade.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Wall.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\LookFoward.cs" />
     <Compile Include="Assets\Scripts\ScriptableObjects\CardsData.cs" />
     <Compile Include="Assets\Scripts\TileController.cs" />
   </ItemGroup>
