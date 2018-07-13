@@ -74,7 +74,7 @@ MonoBehaviour:
     m_ShadowTeleportRange: 0
     m_ShadowSightRange: 0
     m_IndirectAttack: 1
-  - m_CardName: Crossbowman
+  - m_CardName: Archer
     m_TemplateCardType: 0
     m_CastCost: 2
     m_CastRange: 1

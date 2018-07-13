@@ -16,6 +16,5 @@ public class BaseSpell : Card
     protected override void Awake()
     {
         base.Awake();
-        m_CastRange = 2;
     }
 }

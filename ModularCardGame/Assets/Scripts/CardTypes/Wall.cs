@@ -9,4 +9,10 @@ public class Wall : Card
         m_CardName = i_Name;
         m_Position = i_Position;
     }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        m_CharacterPrefab = (GameObject)Resources.Load("CharWall", typeof(GameObject));
+    }
 }
