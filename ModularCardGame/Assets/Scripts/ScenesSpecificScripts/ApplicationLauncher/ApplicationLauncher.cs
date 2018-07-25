@@ -6,6 +6,6 @@ public class ApplicationLauncher : MonoBehaviour
 {
     private void Start()
     {
-        LevelManager.Instance.ChangeLevel("MainMenu");
+        LevelManager.Instance.ChangeLevel("MainMenu", 0f);
     }
 }

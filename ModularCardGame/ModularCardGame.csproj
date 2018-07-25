@@ -345,6 +345,7 @@
     <Compile Include="Assets\AssetStore+Standard assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\AssetStore+Standard assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\AssetStore+Standard assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\AssetStore+Standard assets\UETools\Magic_Particle_Effects\Scripts\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Archer.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Armor.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Attack.cs" />
@@ -360,11 +361,16 @@
     <Compile Include="Assets\Scripts\CardTypes\Tower.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Trade.cs" />
     <Compile Include="Assets\Scripts\CardTypes\Wall.cs" />
+    <Compile Include="Assets\Scripts\Enums\EPoolType.cs" />
+    <Compile Include="Assets\Scripts\GenericScripts\PoolableObjects.cs" />
     <Compile Include="Assets\Scripts\Managers\AnimationManager.cs" />
     <Compile Include="Assets\Scripts\Managers\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Managers\DontDestroyOnLoad.cs" />
+    <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\PoolManager.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\ApplicationLauncher\ApplicationLauncher.cs" />
+    <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\Avatars.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\BoardGenerator.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\GameController.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\LookFoward.cs" />
@@ -403,6 +409,7 @@
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\AssetStore+Standard assets\UETools\Magic_Particle_Effects\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

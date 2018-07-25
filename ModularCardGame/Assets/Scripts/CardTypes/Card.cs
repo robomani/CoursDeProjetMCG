@@ -279,6 +279,12 @@ public class Card : MonoBehaviour
     protected void Start()
     {
         UpdateStatsOnCard();
+        GameController.ChangeTurn += TurnTick;
+    }
+
+    private void OnDestroy()
+    {
+        GameController.ChangeTurn -= TurnTick;
     }
 
     public void InitCard(CardsData i_CardData)
@@ -601,6 +607,18 @@ public class Card : MonoBehaviour
 
     protected void AnimDie()
     {
+        if (m_Owner == Players.AI)
+        {
+            if (m_CardType == CardType.Creature)
+            {
+                GameManager.Instance.AddOrRemoveCreatureToAI(false);
+            }
+            else if (m_CardType == CardType.Building)
+            {
+                GameManager.Instance.AddOrRemoveBuildingToAI(false);
+            }
+        }
+
         if (m_Character != null && m_Character.GetComponent<Animator>())
         {
             m_Character.GetComponent<Animator>().SetTrigger("Die");
@@ -624,6 +642,14 @@ public class Card : MonoBehaviour
         if (m_Character != null && m_Character.GetComponent<Animator>())
         {
             m_Character.GetComponent<Animator>().SetTrigger("Idle");
+        }
+    }
+
+    private void TurnTick()
+    {
+        if (m_ShadowTime > 0 && m_State == States.InPlay)
+        {
+            m_TileOccupied.SetShadow(m_ShadowTime, m_Owner);
         }
     }
 }

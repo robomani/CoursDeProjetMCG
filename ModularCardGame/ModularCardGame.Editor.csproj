@@ -393,6 +393,7 @@
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\AssetStore+Standard assets\UETools\Magic_Particle_Effects\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
