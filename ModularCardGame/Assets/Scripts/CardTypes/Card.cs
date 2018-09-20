@@ -60,7 +60,6 @@ public class Card : MonoBehaviour
     private CardType m_CardType;
     #endregion
 
-
     public string m_CardName;
     public bool m_Playable = true;
     public bool m_ValidTarget = false;
@@ -71,6 +70,7 @@ public class Card : MonoBehaviour
     public TextMeshPro m_HpText;
     public TextMeshPro m_MoveText;
     public GameObject m_CharacterPrefab;
+    public SpriteRenderer m_Star;
 
     protected States m_State = States.InDeck;
     protected Transform m_SpawnPoint;
@@ -273,7 +273,15 @@ public class Card : MonoBehaviour
                 m_SpawnPoint = TR;
             }    
         }
-            
+
+        SpriteRenderer[] tempSprite = GetComponentsInChildren<SpriteRenderer>();
+        foreach (SpriteRenderer SR in tempSprite)
+        {
+            if (SR.name == "Star")
+            {
+                m_Star = SR;
+            }
+        }
     }
 
     protected void Start()
@@ -351,8 +359,18 @@ public class Card : MonoBehaviour
             m_AttackText.text = m_Attack.ToString();
             m_HpText.text = m_Hp.ToString();
             m_MoveText.text = m_Mouvement.ToString();
-        }  
-        
+        }
+        if (m_ArmorPercing > 0 || m_ShadowOnLifeLost > 0 || m_ArmorAlfterMove > 0 || m_Armor > 0 || m_NumberOfSpellToIgnore > 0 || m_TradeRange > 0 
+            || m_TradeResist > 0 || m_TradeCostReduction > 0 || m_MoveAlfterTrade > 0 || m_TradeAdjacent > 0 || m_ArmorAlfterTrade > 0 || m_ShadowAlfterTrade > 0
+            || m_PushRange > 0 || m_PushResist > 0 || m_MoveAlfterPush > 0 || m_LateralPush > 0 || m_ArmorAlfterGettingPushed > 0 || m_ShadowAlfterPush > 0
+            || m_ShadowTime > 0 || m_ShadowTeleportRange > 0 || m_ShadowSightRange > 0 || m_IndirectAttack == true)
+        {
+            m_Star.enabled = true;
+        }
+        else
+        {
+            m_Star.enabled = false;
+        }
     }
 
     public void CopyCard(Card i_Card)
@@ -482,6 +500,11 @@ public class Card : MonoBehaviour
             m_ShadowTime += i_Card.m_ShadowTime;
             m_ShadowTeleportRange += i_Card.m_ShadowTeleportRange;
             m_ShadowSightRange += i_Card.m_ShadowSightRange;
+
+            if (m_ShadowTime > 0)
+            {
+                m_TileOccupied.SetShadow(m_ShadowTime, m_Owner);
+            }   
         }
         
 

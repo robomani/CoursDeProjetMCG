@@ -356,10 +356,8 @@ public class GameController : MonoBehaviour
                 {
                     ShowValidTiles(CardOver);
                 }
-                
-                              
+                      
                 m_LastCard = CardOver;
-
             }
             else
             {
@@ -461,7 +459,6 @@ public class GameController : MonoBehaviour
                 m_AIGrave[System.Array.IndexOf(m_AIGrave, null)] = i_Target.gameObject;
                 m_SelectedCard = null;
                 ShowNormalTiles();
-
             }
 
             i_Target.m_TileOccupied.ClearTile();
@@ -768,7 +765,6 @@ public class GameController : MonoBehaviour
                                 }
                             }
 
-
                             if (endLoop)
                             {
                                 break;
@@ -808,7 +804,6 @@ public class GameController : MonoBehaviour
                                     endLoop = true;
                                     break;
                                 }
-
                             }
                         }
 
@@ -1036,7 +1031,6 @@ public class GameController : MonoBehaviour
         m_PlayerMana = m_PlayerMaxMana;
         m_TurnOwner = Card.Players.Player;
         CheckPlayableCard();
-
     }
 
     private void UpdateTexts()
@@ -1085,7 +1079,6 @@ public class GameController : MonoBehaviour
         {
             //TODO:: Start a coroutine that flash the mana counter of the player and the PowerDrawButon
         }
-
     }
 
     public void StopWaitingForMulligan()
@@ -1133,13 +1126,15 @@ public class GameController : MonoBehaviour
             TileController tile = null;
             TileController selected = i_Card.m_TileOccupied;
             int range = i_Card.Movement;
-            int AttackRange = i_Card.AttackRange;
-
+            int attackRange = i_Card.AttackRange;
 
             for (int i = 0; i < m_Board.m_Tiles.Length; i++)
             {
                 tile = m_Board.m_Tiles[i].GetComponent<TileController>();
-                
+
+                int tempRange = range;
+                int tempAttackRange = attackRange;
+
                 if ((selected.PosX + range >=  tile.PosX && selected.PosX - range <= tile.PosX) && (selected.PosY + range >= tile.PosY && selected.PosY - range <= tile.PosY))
                 {
                     if (tile != selected && tile.m_OccupiedBy == null)
@@ -1154,33 +1149,43 @@ public class GameController : MonoBehaviour
                         }
                     }                    
                 }
-                if ((selected.PosX + AttackRange >= tile.PosX && selected.PosX - AttackRange <= tile.PosX) && (selected.PosY + AttackRange >= tile.PosY && selected.PosY - AttackRange <= tile.PosY))
+                if ((selected.PosX + attackRange >= tile.PosX && selected.PosX - attackRange <= tile.PosX))
                 {
-                    if (i_Card.IndirectAttack)
+                    if (selected.PosX + attackRange - tile.PosX >= 0)
                     {
-                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
-                        {
-                            tile.m_OccupiedBy.ValidTarget();
-
-                        }
-                        tile.InAttackRange();
+                        tempRange = (selected.PosX + attackRange - tile.PosX);
                     }
-                    else if(selected.PosX == tile.PosX || selected.PosY == tile.PosY)
+                    else if (selected.PosX - attackRange + tile.PosX >= 0)
                     {
-                        if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
+                        tempRange = (selected.PosX - attackRange + tile.PosX);
+                    }
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    if (selected.PosY + tempRange >= tile.PosY && selected.PosY - tempRange <= tile.PosY)
+                    {
+                        if (i_Card.IndirectAttack)
                         {
-                            tile.m_OccupiedBy.ValidTarget();
-
+                            if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
+                            {
+                                tile.m_OccupiedBy.ValidTarget();
+                            }
+                            tile.InAttackRange();
                         }
-                        tile.InAttackRange();
+                        else if (selected.PosX == tile.PosX || selected.PosY == tile.PosY)
+                        {
+                            if (tile != selected && tile.m_OccupiedBy != null && tile.m_OccupiedBy.m_Owner != i_Card.m_Owner)
+                            {
+                                tile.m_OccupiedBy.ValidTarget();
+                            }
+                            tile.InAttackRange();
+                        }
                     }
                 }
             }
-            if(selected.PosX + AttackRange >= 5 && i_Card.m_Owner == Card.Players.Player)
+            if(selected.PosX + attackRange >= 5 && i_Card.m_Owner == Card.Players.Player)
             {
                 m_AltarAI.InAttackRange();
             }
-            else if (selected.PosX - AttackRange < 0 && i_Card.m_Owner == Card.Players.AI)
+            else if (selected.PosX - attackRange < 0 && i_Card.m_Owner == Card.Players.AI)
             {
                 m_AltarPlayer.InAttackRange();
             }
@@ -1219,7 +1224,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void UpdateAIText()
+    private void UpdateAIManaText()
     {
         m_ManaAIText.text = m_AIMana.ToString() + "/" + m_AIMaxMana.ToString();
     }
@@ -1234,7 +1239,6 @@ public class GameController : MonoBehaviour
             m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
         }
         
-
         CheckPlayableCard();
     }
 
@@ -1322,16 +1326,14 @@ public class GameController : MonoBehaviour
     }
     
     public void AIDiscardCard(Card i_Card)
-    {
-        
+    { 
         m_AIGrave[System.Array.IndexOf(m_AIGrave, null)] = i_Card.gameObject;
         StartCoroutine(CardMove(i_Card.transform, i_Card.transform.position, m_AIGravePosition.position, i_Card.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
         i_Card.ChangeState(Card.States.InGrave);
         m_AIHand[i_Card.m_Position] = null;
         m_ZoomCard.SetActive(false);
         m_AIMana--;
-        AIDrawCard();
-        
+        AIDrawCard();       
     }
 
     public void DiscardCard()
@@ -1359,7 +1361,6 @@ public class GameController : MonoBehaviour
             DiscardCard();
             ChangePlayerMana(1);
         }
-        
     }
 
     private GameObject AddCardToDeck( int i_Counter, int i_Position, Card.Players i_Player )
@@ -1459,7 +1460,6 @@ public class GameController : MonoBehaviour
                 i--;
             }
         }
-
         return tempDeck;
     }
 
@@ -1513,7 +1513,6 @@ public class GameController : MonoBehaviour
             i_Card.GetComponent<Card>().AnimWalk();
         }
         
-
         yield return new WaitForSeconds(0.2f);
         float value;
 

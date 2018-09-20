@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularCardGame", "ModularCardGame.csproj", "{62FA9CE5-A43F-8DC1-0208-44872F36CDD9}"
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularCardGame", "Assembly-CSharp.csproj", "{5F67711B-19A4-117D-EC31-E32E3922FB4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularCardGame.Editor", "ModularCardGame.Editor.csproj", "{FB820F18-0688-E068-FF2C-FA0B6DD64E4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularCardGame", "Assembly-CSharp-Editor.csproj", "{D655B515-33DE-01A2-5B2B-6F406C4FE10E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,14 +11,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{62FA9CE5-A43F-8DC1-0208-44872F36CDD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{62FA9CE5-A43F-8DC1-0208-44872F36CDD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{62FA9CE5-A43F-8DC1-0208-44872F36CDD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{62FA9CE5-A43F-8DC1-0208-44872F36CDD9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB820F18-0688-E068-FF2C-FA0B6DD64E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB820F18-0688-E068-FF2C-FA0B6DD64E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB820F18-0688-E068-FF2C-FA0B6DD64E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB820F18-0688-E068-FF2C-FA0B6DD64E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F67711B-19A4-117D-EC31-E32E3922FB4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F67711B-19A4-117D-EC31-E32E3922FB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F67711B-19A4-117D-EC31-E32E3922FB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F67711B-19A4-117D-EC31-E32E3922FB4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D655B515-33DE-01A2-5B2B-6F406C4FE10E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D655B515-33DE-01A2-5B2B-6F406C4FE10E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D655B515-33DE-01A2-5B2B-6F406C4FE10E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D655B515-33DE-01A2-5B2B-6F406C4FE10E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
