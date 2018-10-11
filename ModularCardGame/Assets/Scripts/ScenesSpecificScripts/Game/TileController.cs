@@ -21,6 +21,18 @@ public class TileController : MonoBehaviour
     private Vector3 m_baseShadowPosition;
     private Vector3 m_currentShadowPosition;
 
+    #region SpellVariables
+    private int m_SpellTurnDuration = 0;
+    private int m_DamagePerTurn = 0;
+    private int m_ArmorPerTurn = 0;
+    private int m_ArmorPercing = 0;
+    private int m_ShadowPerTurn = 0;
+    private TileController m_TradeTarget;
+    private TileController m_PushTarget;
+    private Card.Players m_SpellOwner;
+    private Card m_OccupiedTemp;
+    #endregion
+
     private void Start()
     {
         if (m_ShadowEffect != null)
@@ -35,12 +47,12 @@ public class TileController : MonoBehaviour
             m_AvatarColor = m_Avatar.GetComponent<Renderer>().material.color;
         }
 
-        GameController.ChangeTurn += ShadowTick;
+        GameController.ChangeTurn += TurnTick;
     }
 
     private void OnDestroy()
     {
-        GameController.ChangeTurn -= ShadowTick;
+        GameController.ChangeTurn -= TurnTick;
     }
 
     public void Illuminate()
@@ -123,8 +135,23 @@ public class TileController : MonoBehaviour
         m_ShadowTime = 0;
     }
 
-    private void ShadowTick()
+    private void TurnTick()
     {
+        if (--m_SpellTurnDuration <= 0)
+        {
+            m_TradeTarget = null;
+            m_PushTarget = null;
+            m_ShadowPerTurn = 0;
+            m_DamagePerTurn = 0;
+            m_ArmorPercing = 0;
+            m_ArmorPerTurn = 0;
+            m_SpellOwner = Card.Players.None;
+        }
+        else
+        {
+            SpellEffects();
+        } 
+
         if (m_ShadowTime > 0)
         {
             m_ShadowTime--;
@@ -134,5 +161,85 @@ public class TileController : MonoBehaviour
         {
             m_ShadowEffect.SetActive(false);
         }
+
+        
+    }
+
+    public void SpellEffects()
+    {
+        SetShadow(m_ShadowPerTurn, m_SpellOwner);
+
+        SpellDamage();
+        SpellTrade();
+        SpellPush();
+
+        
+    }
+
+    private void SpellDamage()
+    {
+        if (m_OccupiedBy != null)
+        {
+            m_OccupiedBy.LoseHp(m_DamagePerTurn, m_ArmorPercing);
+        }
+    }
+
+    private void SpellTrade()
+    {
+        if (m_TradeTarget != null && m_OccupiedBy != null)
+        {
+            m_OccupiedTemp = m_TradeTarget.m_OccupiedBy;
+            m_TradeTarget.m_OccupiedBy = m_OccupiedBy;
+            m_OccupiedBy = m_OccupiedTemp;
+            m_OccupiedTemp = null;
+
+            SpellDamage();
+        }
+    }
+
+    private void SpellPush()
+    {
+        if (m_PushTarget != null && m_OccupiedBy != null)
+        {
+            if (m_PushTarget.m_OccupiedBy != null)
+            {
+                m_OccupiedBy.LoseHp(1);
+                m_PushTarget.m_OccupiedBy.LoseHp(1);
+            }
+        }
+    }
+
+    public void AddSpellEffects(Card i_Spell)
+    {
+        if (m_SpellOwner == Card.Players.None || m_SpellOwner == i_Spell.m_Owner)
+        {
+            m_SpellOwner = i_Spell.m_Owner;
+        }
+        else
+        {
+            m_SpellOwner = Card.Players.Wild;
+        }
+        
+        m_SpellTurnDuration = i_Spell.HP;
+        m_DamagePerTurn = i_Spell.Attack;
+        if (m_DamagePerTurn > 0)
+        {
+            m_ArmorPercing = i_Spell.Armor;
+        }
+        else
+        {
+            m_ArmorPerTurn = i_Spell.Armor;
+        }
+        m_ShadowPerTurn = i_Spell.ShadowTime;
+    }
+
+    public void AddTargetTradeTile(TileController i_Tile)
+    {
+        m_TradeTarget = i_Tile;
+    }
+
+    public void AddTargetPushTile(TileController i_Tile)
+    {
+        m_PushTarget = i_Tile;
     }
 }

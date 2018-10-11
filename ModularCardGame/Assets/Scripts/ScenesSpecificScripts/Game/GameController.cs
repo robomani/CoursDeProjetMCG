@@ -186,6 +186,8 @@ public class GameController : MonoBehaviour
     private Card m_SelectedCard = null;
     private Vector3 m_TempPosition;
 
+    public Camera m_MainCamera;
+    public Camera m_ZoomCamera;
     #endregion
 
     public static Action ChangeTurn;
@@ -255,174 +257,192 @@ public class GameController : MonoBehaviour
             m_ResultText.gameObject.SetActive(true);
             m_ResultText.text = "You Won";
         }
-        m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit HitInfo;
-        RaycastHit TileHitInfo;
-        if (m_TurnOwner == Card.Players.Player && !m_WaitForMulligan)
+        if (!m_MainCamera.enabled)
         {
-            Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
-            
-            if (Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar AI")))
+            if (Input.GetButtonDown("Zoom"))
             {
-                if (Input.GetButtonDown("Select") && TileHitInfo.transform.GetComponentInParent<TileController>().m_IsValidTarget && m_SelectedCard != null)
-                {
-                    ChangePlayerMana(-m_SelectedCard.ActivateCost);
-                    HurtEnemy(m_SelectedCard.Attack);
-                    m_SelectedCard.UnIlluminate();
-                    m_SelectedCard = null;
-                    ShowNormalTiles();
-                }
+                m_ZoomCard.SetActive(false);
+                m_MainCamera.enabled = true;
+                m_ZoomCamera.enabled = false;
+
             }
-            else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f,LayerMask.GetMask("Card")))
+        }
+        else
+        {
+            m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit HitInfo;
+            RaycastHit TileHitInfo;
+            if (m_TurnOwner == Card.Players.Player && !m_WaitForMulligan)
             {
-                Card CardOver = HitInfo.transform.GetComponent<Card>();
-                if (m_LastCard != null && m_LastCard != CardOver && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
+                Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
+
+                if (Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar AI")))
                 {
-                    m_LastCard.UnIlluminate();
+                    if (Input.GetButtonDown("Select") && TileHitInfo.transform.GetComponentInParent<TileController>().m_IsValidTarget && m_SelectedCard != null)
+                    {
+                        ChangePlayerMana(-m_SelectedCard.ActivateCost);
+                        HurtEnemy(m_SelectedCard.Attack);
+                        m_SelectedCard.UnIlluminate();
+                        m_SelectedCard = null;
+                        ShowNormalTiles();
+                    }
+                }
+                else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f, LayerMask.GetMask("Card")))
+                {
+                    Card CardOver = HitInfo.transform.GetComponent<Card>();
+                    if (m_LastCard != null && m_LastCard != CardOver && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
+                    {
+                        m_LastCard.UnIlluminate();
+                    }
+
+                    if (Input.GetButtonDown("Select") && m_SelectedCard != null && m_SelectedCard.CardType == CardType.Component && CardOver.m_ValidTarget)
+                    {
+                        ChangePlayerMana(-m_SelectedCard.CastingCost);
+                        CardOver.AddComponentCard(m_SelectedCard);
+                        m_BtnDiscard.SetActive(false);
+                        Destroy(m_SelectedCard.gameObject);
+                        m_SelectedCard = null;
+                        ShowNormalTiles();
+                        CheckPlayableCard();
+                    }
+                    else if (Input.GetButtonDown("Select") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay) && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
+                    {
+                        if (m_SelectedCard != CardOver && ((CardOver.State == Card.States.InHand && CardOver.CastingCost <= m_PlayerMana) || (CardOver.State == Card.States.InPlay && CardOver.ActivateCost <= m_PlayerMana)))
+                        {
+                            if (m_SelectedCard != null)
+                            {
+                                m_SelectedCard.UnIlluminate();
+                            }
+                            m_SelectedCard = CardOver;
+
+                            if (m_SelectedCard.State == Card.States.InHand)
+                            {
+                                m_BtnDiscard.SetActive(true);
+                                Vector3 temp = m_SelectedCard.transform.position;
+                                temp.y += 1f;
+                                temp.x -= 2.5f;
+                                temp.z -= 0.75f;
+                                m_BtnDiscard.transform.position = temp;
+                            }
+                            ShowNormalTiles();
+                            m_SelectedCard.SelectedColor();
+                            ShowValidTiles(m_SelectedCard);
+                        }
+                        else
+                        {
+                            ShowNormalCards();
+                            if (m_SelectedCard != null)
+                            {
+                                m_SelectedCard.UnIlluminate();
+                            }
+                            ShowNormalTiles();
+                            m_SelectedCard = null;
+                            m_BtnDiscard.SetActive(false);
+                        }
+
+                    }
+                    else if (Input.GetButtonDown("Select") && CardOver.State == Card.States.InPlay && CardOver.m_ValidTarget)
+                    {
+                        AttackCard(m_SelectedCard, CardOver);
+                    }
+
+
+                    if (Input.GetButtonDown("Zoom") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay))
+                    {
+                        m_ZoomCard.SetActive(true);
+                        m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
+                        m_ZoomCard.GetComponent<Card>().CopyCard(CardOver);
+                        m_ZoomCamera.enabled = true;
+                        m_MainCamera.enabled = false;
+
+                    }
+
+                    if (m_SelectedCard != CardOver && CardOver != m_ZoomCard.GetComponent<Card>() && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
+                    {
+                        if (m_SelectedCard != null && m_SelectedCard.CardType == CardType.Component)
+                        {
+
+                        }
+                        else
+                        {
+                            CardOver.Illuminate();
+                        }
+                    }
+
+                    if (m_SelectedCard == null && ((CardOver.State != Card.States.InDeck && CardOver.State != Card.States.InGrave) && ((CardOver.State == Card.States.InPlay && CardOver.m_Owner == Card.Players.AI) || CardOver.m_Owner == Card.Players.Player)))
+                    {
+                        ShowValidTiles(CardOver);
+                    }
+
+                    m_LastCard = CardOver;
+                }
+                else
+                {
+                    if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
+                    {
+                        m_LastCard.UnIlluminate();
+                        m_LastCard.m_CardName = "";
+                    }
+
+                    if (m_SelectedCard == null)
+                    {
+                        ShowNormalTiles();
+                    }
+
+                    if (Input.GetButtonDown("Zoom"))
+                    {
+                        m_ZoomCard.SetActive(false);
+                        m_MainCamera.enabled = true;
+                        m_ZoomCamera.enabled = false;
+
+                    }
                 }
 
-                if (Input.GetButtonDown("Select") && m_SelectedCard != null && m_SelectedCard.CardType == CardType.Component && CardOver.m_ValidTarget)
+                if (Input.GetButtonDown("Select") && m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles")) && TileHitInfo.transform.GetComponent<TileController>().m_IsValid)
                 {
-                    ChangePlayerMana(-m_SelectedCard.CastingCost);
-                    CardOver.AddComponentCard(m_SelectedCard);
+                    m_TempPosition = TileHitInfo.transform.position;
+                    if (m_SelectedCard.ShadowTime > 0)
+                    {
+                        TileHitInfo.transform.GetComponent<TileController>().SetShadow(m_SelectedCard.ShadowTime, m_SelectedCard.m_Owner);
+                    }
+                    StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
+                    if (m_SelectedCard.State == Card.States.InHand)
+                    {
+                        m_SelectedCard.ChangeState(Card.States.InPlay);
+                        m_PlayerHand[m_SelectedCard.m_Position] = null;
+                        m_SelectedCard.m_Position = -1;
+                        ChangePlayerMana(-m_SelectedCard.CastingCost);
+                    }
+                    else
+                    {
+                        m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
+                        ChangePlayerMana(-m_SelectedCard.ActivateCost);
+                    }
+                    m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
+                    TileHitInfo.transform.GetComponent<TileController>().m_OccupiedBy = m_SelectedCard;
                     m_BtnDiscard.SetActive(false);
-                    Destroy(m_SelectedCard.gameObject);
                     m_SelectedCard = null;
                     ShowNormalTiles();
                     CheckPlayableCard();
                 }
-                else if (Input.GetButtonDown("Select") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay) && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
+
+                if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_PlayerMana > 0)
                 {
-                    if (m_SelectedCard != CardOver && ((CardOver.State == Card.States.InHand && CardOver.CastingCost <= m_PlayerMana) || (CardOver.State == Card.States.InPlay && CardOver.ActivateCost <= m_PlayerMana)))
-                    {
-                        if (m_SelectedCard != null)
-                        {
-                            m_SelectedCard.UnIlluminate();
-                        }
-                        m_SelectedCard = CardOver;
-                        
-                        if (m_SelectedCard.State == Card.States.InHand)
-                        {
-                            m_BtnDiscard.SetActive(true);
-                            Vector3 temp = m_SelectedCard.transform.position;
-                            temp.y += 1f;
-                            temp.x -= 2.5f;
-                            temp.z -= 0.75f;
-                            m_BtnDiscard.transform.position = temp;
-                        }
-                        ShowNormalTiles();
-                        m_SelectedCard.SelectedColor();
-                        ShowValidTiles(m_SelectedCard);    
-                    }
-                    else
-                    {
-                        ShowNormalCards();
-                        if (m_SelectedCard != null)
-                        {
-                            m_SelectedCard.UnIlluminate();
-                        }
-                        ShowNormalTiles();
-                        m_SelectedCard = null;
-                        m_BtnDiscard.SetActive(false);
-                    }
-                    
-                }
-                else if (Input.GetButtonDown("Select") && CardOver.State == Card.States.InPlay && CardOver.m_ValidTarget)
-                {
-                    AttackCard(m_SelectedCard, CardOver);
+                    ActivatePlayerAvatar();
                 }
 
-
-                if (Input.GetButtonDown("Zoom") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay))
+                if (Input.GetButtonDown("Cheat"))
                 {
-                    m_ZoomCard.SetActive(true);
-                    m_ZoomCard.GetComponent<Renderer>().material = HitInfo.transform.GetComponent<Renderer>().material;
-                    m_ZoomCard.GetComponent<Card>().CopyCard(CardOver);
+                    DrawCard();
+                    ChangePlayerMana(10);
+                    m_PlayerHp += 1;
                 }
-
-                if(m_SelectedCard != CardOver && CardOver != m_ZoomCard.GetComponent<Card>() && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
-                {
-                    if (m_SelectedCard != null && m_SelectedCard.CardType == CardType.Component)
-                    {
-
-                    }
-                    else
-                    {
-                        CardOver.Illuminate();
-                    }  
-                }
-
-                if (m_SelectedCard == null && ((CardOver.State != Card.States.InDeck && CardOver.State != Card.States.InGrave) && ((CardOver.State == Card.States.InPlay && CardOver.m_Owner == Card.Players.AI) || CardOver.m_Owner == Card.Players.Player)))
-                {
-                    ShowValidTiles(CardOver);
-                }
-                      
-                m_LastCard = CardOver;
             }
-            else
+            else if (m_TurnOwner == Card.Players.AI && !m_WaitForMulligan)
             {
-                if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
-                {
-                    m_LastCard.UnIlluminate();
-                    m_LastCard.m_CardName = "";
-                }
 
-                if (m_SelectedCard == null)
-                {
-                    ShowNormalTiles();
-                }
-
-                if (Input.GetButtonDown("Zoom"))
-                {
-                    m_ZoomCard.SetActive(false);
-                }
-            }
-
-            if (Input.GetButtonDown("Select") &&  m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles"))  && TileHitInfo.transform.GetComponent<TileController>().m_IsValid )
-            {
-                m_TempPosition = TileHitInfo.transform.position;
-                if (m_SelectedCard.ShadowTime > 0)
-                {
-                    TileHitInfo.transform.GetComponent<TileController>().SetShadow(m_SelectedCard.ShadowTime,m_SelectedCard.m_Owner);
-                }
-                StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                if (m_SelectedCard.State == Card.States.InHand)
-                {
-                    m_SelectedCard.ChangeState(Card.States.InPlay);
-                    m_PlayerHand[m_SelectedCard.m_Position] = null;
-                    m_SelectedCard.m_Position = -1;
-                    ChangePlayerMana(-m_SelectedCard.CastingCost);
-                }
-                else
-                {
-                    m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
-                    ChangePlayerMana(-m_SelectedCard.ActivateCost);  
-                }   
-                m_SelectedCard.m_TileOccupied = TileHitInfo.transform.GetComponent<TileController>();
-                TileHitInfo.transform.GetComponent<TileController>().m_OccupiedBy = m_SelectedCard;
-                m_BtnDiscard.SetActive(false);
-                m_SelectedCard = null;
-                ShowNormalTiles();
-                CheckPlayableCard();
-            }
-
-            if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_PlayerMana > 0)
-            {
-                ActivatePlayerAvatar();
-            }
-
-            if (Input.GetButtonDown("Cheat"))
-            { 
-                DrawCard();
-                ChangePlayerMana(10);
-                m_PlayerHp += 1;
             }
         }
-        else if (m_TurnOwner == Card.Players.AI && !m_WaitForMulligan)
-        {
-            
-        }
-
         if (m_SelectedCard != null)
         {
             ShowValidTiles(m_SelectedCard);

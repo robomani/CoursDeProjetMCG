@@ -122,6 +122,11 @@ public class AudioManager : DontDestroyOnLoad
         }
         StartCoroutine(SwichMusicRoutine(i_Duration, nextClip));
     }
+
+    public void PlayPingSound()
+    {
+
+    }
     /*
     public void PlaySFX(AudioClip i_Clip, Vector3 i_Position)
     {

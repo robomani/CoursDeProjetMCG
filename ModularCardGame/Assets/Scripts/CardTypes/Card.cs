@@ -12,13 +12,15 @@ public class Card : MonoBehaviour
         InHand,
         InPlay,
         InGrave,
-        InVoid
+        InVoid,
     }
 
     public enum Players
     {
         Player,
-        AI
+        AI,
+        None,
+        Wild,
     }
 
 
@@ -28,36 +30,36 @@ public class Card : MonoBehaviour
     public TileController m_TileOccupied;
 
     #region Card Stats
-    private int m_CastCost = 1;
-    private int m_CastRange = 1;
-    private int m_ActivateCost = 1;
-    private int m_Attack = 1;
-    private int m_AttackRange = 1;
-    private int m_ArmorPercing;
-    private int m_Hp = 1;
-    private int m_ShadowOnLifeLost;
-    private int m_Mouvement = 0;
-    private int m_ArmorAlfterMove;
-    private int m_Armor;
-    private int m_NumberOfSpellToIgnore;
-    private int m_TradeRange;
-    private int m_TradeResist;
-    private int m_TradeCostReduction;
-    private int m_MoveAlfterTrade;
-    private int m_TradeAdjacent;
-    private int m_ArmorAlfterTrade;
-    private int m_ShadowAlfterTrade;
-    private int m_PushRange;
-    private int m_PushResist;
-    private int m_MoveAlfterPush;
-    private int m_LateralPush;
-    private int m_ArmorAlfterGettingPushed;
-    private int m_ShadowAlfterPush;
-    private int m_ShadowTime;
-    private int m_ShadowTeleportRange;
-    private int m_ShadowSightRange;
-    private bool m_IndirectAttack;
-    private CardType m_CardType;
+    protected int m_CastCost = 1;
+    protected int m_CastRange = 1;
+    protected int m_ActivateCost = 1;
+    protected int m_Attack = 1;
+    protected int m_AttackRange = 1;
+    protected int m_ArmorPercing;
+    protected int m_Hp = 1;
+    protected int m_ShadowOnLifeLost;
+    protected int m_Mouvement = 0;
+    protected int m_ArmorAlfterMove;
+    protected int m_Armor;
+    protected int m_NumberOfSpellToIgnore;
+    protected int m_TradeRange;
+    protected int m_TradeResist;
+    protected int m_TradeCostReduction;
+    protected int m_MoveAlfterTrade;
+    protected int m_TradeAdjacent;
+    protected int m_ArmorAlfterTrade;
+    protected int m_ShadowAlfterTrade;
+    protected int m_PushRange;
+    protected int m_PushResist;
+    protected int m_MoveAlfterPush;
+    protected int m_LateralPush;
+    protected int m_ArmorAlfterGettingPushed;
+    protected int m_ShadowAlfterPush;
+    protected int m_ShadowTime;
+    protected int m_ShadowTeleportRange;
+    protected int m_ShadowSightRange;
+    protected bool m_IndirectAttack;
+    protected CardType m_CardType;
     #endregion
 
     public string m_CardName;
@@ -71,6 +73,7 @@ public class Card : MonoBehaviour
     public TextMeshPro m_MoveText;
     public GameObject m_CharacterPrefab;
     public SpriteRenderer m_Star;
+    public TextMeshPro m_HabilityList;
 
     protected States m_State = States.InDeck;
     protected Transform m_SpawnPoint;
@@ -282,6 +285,15 @@ public class Card : MonoBehaviour
                 m_Star = SR;
             }
         }
+
+        TextMeshPro[] tempTMP = GetComponentsInChildren<TextMeshPro>();
+        foreach (TextMeshPro TMP in tempTMP)
+        {
+            if (TMP.name == "HabilityList")
+            {
+                m_HabilityList = TMP;
+            }
+        }
     }
 
     protected void Start()
@@ -365,16 +377,24 @@ public class Card : MonoBehaviour
             || m_PushRange > 0 || m_PushResist > 0 || m_MoveAlfterPush > 0 || m_LateralPush > 0 || m_ArmorAlfterGettingPushed > 0 || m_ShadowAlfterPush > 0
             || m_ShadowTime > 0 || m_ShadowTeleportRange > 0 || m_ShadowSightRange > 0 || m_IndirectAttack == true)
         {
-            m_Star.enabled = true;
+            if (m_Star != null)
+            {
+                m_Star.enabled = true;
+            }
         }
         else
         {
-            m_Star.enabled = false;
+            if (m_Star != null)
+            {
+                m_Star.enabled = false;
+            } 
         }
     }
 
     public void CopyCard(Card i_Card)
     {
+        string HabilityListText = "";
+
         m_CastCost = i_Card.m_CastCost;
         m_CastRange = i_Card.m_CastRange;
 
@@ -383,55 +403,171 @@ public class Card : MonoBehaviour
         m_Attack = i_Card.m_Attack;
         m_AttackRange = i_Card.m_AttackRange;
         m_ArmorPercing = i_Card.m_ArmorPercing;
+        if (m_ArmorPercing > 0)
+        {
+            HabilityListText += "Armor Percing : " + m_ArmorPercing + "  \n";
+        }
 
         m_Hp = i_Card.m_Hp;
         m_ShadowOnLifeLost = i_Card.m_ShadowOnLifeLost;
+        if (m_ShadowOnLifeLost > 0)
+        {
+            HabilityListText += "Shadow On life lost : " + m_ShadowOnLifeLost + "  \n";
+        }
 
         m_Mouvement = i_Card.m_Mouvement;
         m_ArmorAlfterMove = i_Card.m_ArmorAlfterMove;
+        if (m_ArmorAlfterMove > 0)
+        {
+            HabilityListText += "Armor Alfter Move : " + m_ArmorAlfterMove + "  \n";
+        }
 
         m_Armor = i_Card.m_Armor;
+        if (m_Armor > 0)
+        {
+            HabilityListText += "Armor : " + m_Armor + "  \n";
+        }
+
         m_NumberOfSpellToIgnore = i_Card.m_NumberOfSpellToIgnore;
+        if (m_NumberOfSpellToIgnore > 0)
+        {
+            HabilityListText += "Number Of Spell To Ignore : " + m_NumberOfSpellToIgnore + "  \n";
+        }
 
         m_TradeRange = i_Card.m_TradeRange;
+        if (m_TradeRange > 0)
+        {
+            HabilityListText += "Trade Range : " + m_TradeRange + "  \n";
+        }
+
         m_TradeResist = i_Card.m_TradeResist;
+        if (m_TradeResist > 0)
+        {
+            HabilityListText += "Trade Resist : " + m_TradeResist + "  \n";
+        }
+
         m_TradeCostReduction = i_Card.m_TradeCostReduction;
+        if (m_TradeCostReduction > 0)
+        {
+            HabilityListText += "Trade Cost Reduction : " + m_TradeCostReduction + "  \n";
+        }
+
         m_MoveAlfterTrade = i_Card.m_MoveAlfterTrade;
+        if (m_MoveAlfterTrade > 0)
+        {
+            HabilityListText += "Move Alfter Trade : " + m_MoveAlfterTrade + "  \n";
+        }
+
         m_TradeAdjacent = i_Card.m_TradeAdjacent;
+        if (m_TradeAdjacent > 0)
+        {
+            HabilityListText += "Trade Adjacent : " + m_TradeAdjacent + "  \n";
+        }
+
         m_ArmorAlfterTrade = i_Card.m_ArmorAlfterTrade;
+        if (m_ArmorAlfterTrade > 0)
+        {
+            HabilityListText += "Armor Alfter Trade : " + m_ArmorAlfterTrade + "  \n";
+        }
+
         m_ShadowAlfterTrade = i_Card.m_ShadowAlfterTrade;
+        if (m_ShadowAlfterTrade > 0)
+        {
+            HabilityListText += "Shadow Alfter Trade : " + m_ShadowAlfterTrade + "  \n";
+        }
+
         m_PushRange = i_Card.m_PushRange;
+        if (m_PushRange > 0)
+        {
+            HabilityListText += "Push Range : " + m_PushRange + "  \n";
+        }
+
         m_PushResist = i_Card.m_PushResist;
+        if (m_PushResist > 0)
+        {
+            HabilityListText += "Push Resist : " + m_PushResist + "  \n";
+        }
+
         m_MoveAlfterPush = i_Card.m_MoveAlfterPush;
+        if (m_MoveAlfterPush > 0)
+        {
+            HabilityListText += "Move Alfter Push : " + m_MoveAlfterPush + "  \n";
+        }
+
         m_LateralPush = i_Card.m_LateralPush;
+        if (m_LateralPush > 0)
+        {
+            HabilityListText += "Lateral Push : " + m_LateralPush + "  \n";
+        }
+
         m_ArmorAlfterGettingPushed = i_Card.m_ArmorAlfterGettingPushed;
+        if (m_ArmorAlfterGettingPushed > 0)
+        {
+            HabilityListText += "Armor Alfter Getting Pushed : " + m_ArmorAlfterGettingPushed + "  \n";
+        }
+
         m_ShadowAlfterPush = i_Card.m_ShadowAlfterPush;
+        if (m_ShadowAlfterPush > 0)
+        {
+            HabilityListText += "Shadow Alfter Push : " + m_ShadowAlfterPush + "  \n";
+        }
+
         m_ShadowTime = i_Card.m_ShadowTime;
+        if (m_ShadowTime > 0)
+        {
+            HabilityListText += "Shadow Time : " + m_ShadowTime + " \n";
+        }
+
         m_ShadowTeleportRange = i_Card.m_ShadowTeleportRange;
+        if (m_ShadowTeleportRange > 0)
+        {
+            HabilityListText += "Shadow Teleport Range : " + m_ShadowTeleportRange + "  \n";
+        }
+
         m_ShadowSightRange = i_Card.m_ShadowSightRange;
+        if (m_ShadowSightRange > 0)
+        {
+            HabilityListText += "Shadow Sight Range : " + m_ShadowSightRange + "  \n";
+        }
+
         m_IndirectAttack = i_Card.m_IndirectAttack;
+        if (m_IndirectAttack == true)
+        {
+            HabilityListText += "Indirect Attack  \n";
+        }
 
         m_CardType = i_Card.m_CardType;
+
+        if (m_HabilityList != null)
+        {
+            m_HabilityList.text = HabilityListText;
+        }
 
         UpdateStatsOnCard();
     }
 
-    public bool LoseHp(int i_Damage)
+    public bool LoseHp(int i_Damage, int i_ArmorPercing = 0)
     {
         
-        m_Hp -= i_Damage;
+        m_Hp -= (i_Damage - Mathf.Max((m_Armor - i_ArmorPercing),0));
         if (m_Hp <= 0)
         {
             AnimHurt(true);
             return true;
         }
-        AnimHurt(false);
+        if ((i_Damage - Mathf.Max((m_Armor - i_ArmorPercing), 0)) > 0)
+        {
+            AnimHurt(false);
+        }
+        AudioManager.Instance.PlayPingSound();
         UpdateStatsOnCard();
         return false;
     }
 
-    public void AddComponentCard(Card i_Card)
+    public virtual void AddComponentCard(Card i_Card)
     {
+
+
         if (m_State == States.InHand)
         {
             m_CastCost += i_Card.m_CastCost;
