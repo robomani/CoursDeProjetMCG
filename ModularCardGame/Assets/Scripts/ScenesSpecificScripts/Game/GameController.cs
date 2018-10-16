@@ -16,6 +16,10 @@ public struct CardClass
 
 public class GameController : MonoBehaviour
 {
+#if UNITY_CHEAT
+    private bool m_IsCheating = false;
+#endif
+
     #region Variables
 
     #region Player Base Stats
@@ -194,6 +198,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        AudioManager.Instance.GameStart();
         int nbrCardToAdd = Initialise();
 
         m_RandomDeck = !GameManager.Instance.ToggleRandomDeck();
@@ -430,13 +435,39 @@ public class GameController : MonoBehaviour
                 {
                     ActivatePlayerAvatar();
                 }
-
+#if UNITY_CHEAT
                 if (Input.GetButtonDown("Cheat"))
                 {
                     DrawCard();
                     ChangePlayerMana(10);
                     m_PlayerHp += 1;
                 }
+                if (Input.GetKeyDown(KeyCode.D))
+                {
+                    DrawCard();
+                }
+                if (Input.GetKeyDown(KeyCode.A))
+                {
+                    ChangePlayerMana(10);
+                }
+                if (Input.GetKeyDown(KeyCode.S))
+                {
+                    m_PlayerHp += 1;
+                }
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    if (m_IsCheating)
+                    {
+                        m_IsCheating = false;
+                        m_AltarPlayer.GetComponent<Renderer>().material.color = Color.white;
+                    }
+                    else
+                    {
+                        m_IsCheating = true;
+                        m_AltarPlayer.GetComponent<Renderer>().material.color = Color.yellow;
+                    }
+                }
+#endif
             }
             else if (m_TurnOwner == Card.Players.AI && !m_WaitForMulligan)
             {
@@ -448,11 +479,22 @@ public class GameController : MonoBehaviour
             ShowValidTiles(m_SelectedCard);
         }
         UpdateTexts();
+        if (m_IsCheating)
+        {
+            m_AltarPlayer.GetComponent<Renderer>().material.color = Color.yellow;
+        }
     }
 
     private void HurtPlayer(int i_Damage)
     {
-        m_PlayerHp -= i_Damage;
+#if UNITY_CHEAT
+        if (!m_IsCheating)
+        {
+#endif
+            m_PlayerHp -= i_Damage;
+#if UNITY_CHEAT
+        }
+#endif
         AnimationManager.Instance.PlayerHurt();
     }
 

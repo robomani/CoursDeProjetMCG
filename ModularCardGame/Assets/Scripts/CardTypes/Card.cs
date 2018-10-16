@@ -566,84 +566,248 @@ public class Card : MonoBehaviour
 
     public virtual void AddComponentCard(Card i_Card)
     {
-
-
         if (m_State == States.InHand)
         {
             m_CastCost += i_Card.m_CastCost;
             m_ActivateCost += i_Card.m_ActivateCost;
-
-            m_Attack += i_Card.m_Attack;
-            m_AttackRange += i_Card.m_AttackRange;
-            m_ArmorPercing += i_Card.m_ArmorPercing;
-
-            m_Hp += i_Card.m_Hp;
-            m_ShadowOnLifeLost += i_Card.m_ShadowOnLifeLost;
-
-            m_Mouvement += i_Card.m_Mouvement;
-            m_ArmorAlfterMove += i_Card.m_ArmorAlfterMove;
-
-            m_Armor += i_Card.m_Armor;
-            m_NumberOfSpellToIgnore += i_Card.m_NumberOfSpellToIgnore;
-
-            m_TradeRange += i_Card.m_TradeRange;
-            m_TradeResist += i_Card.m_TradeResist;
-            m_TradeCostReduction += i_Card.m_TradeCostReduction;
-            m_MoveAlfterTrade += i_Card.m_MoveAlfterTrade;
-            m_TradeAdjacent += i_Card.m_TradeAdjacent;
-            m_ArmorAlfterTrade += i_Card.m_ArmorAlfterTrade;
-            m_ShadowAlfterTrade += i_Card.m_ShadowAlfterTrade;
-            m_PushRange += i_Card.m_PushRange;
-            m_PushResist += i_Card.m_PushResist;
-            m_MoveAlfterPush += i_Card.m_MoveAlfterPush;
-            m_LateralPush += i_Card.m_LateralPush;
-            m_ArmorAlfterGettingPushed += i_Card.m_ArmorAlfterGettingPushed;
-            m_ShadowAlfterPush += i_Card.m_ShadowAlfterPush;
-            m_ShadowTime += i_Card.m_ShadowTime;
-            m_ShadowTeleportRange += i_Card.m_ShadowTeleportRange;
-            m_ShadowSightRange += i_Card.m_ShadowSightRange;
         }
         else
-        {      
-            m_ActivateCost += Mathf.Max(Mathf.CeilToInt((i_Card.m_ActivateCost + i_Card.m_CastCost)/2),1);
+        {
+            m_ActivateCost += Mathf.Max(Mathf.CeilToInt((i_Card.m_ActivateCost + i_Card.m_CastCost) / 2), 1);
+        }
 
-            m_Attack += i_Card.m_Attack;
-            m_AttackRange += i_Card.m_AttackRange;
-            m_ArmorPercing += i_Card.m_ArmorPercing;
+        m_Attack += i_Card.m_Attack;
+        m_AttackRange += i_Card.m_AttackRange;
+        m_ArmorPercing += i_Card.m_ArmorPercing;
 
-            m_Hp += i_Card.m_Hp;
-            m_ShadowOnLifeLost += i_Card.m_ShadowOnLifeLost;
+        m_Hp += i_Card.m_Hp;
+        m_ShadowOnLifeLost += i_Card.m_ShadowOnLifeLost;
 
-            m_Mouvement += i_Card.m_Mouvement;
-            m_ArmorAlfterMove += i_Card.m_ArmorAlfterMove;
+        m_Mouvement += i_Card.m_Mouvement;
+        m_ArmorAlfterMove += i_Card.m_ArmorAlfterMove;
 
-            m_Armor += i_Card.m_Armor;
-            m_NumberOfSpellToIgnore += i_Card.m_NumberOfSpellToIgnore;
+        m_Armor += i_Card.m_Armor;
+        m_NumberOfSpellToIgnore += i_Card.m_NumberOfSpellToIgnore;
 
-            m_TradeRange += i_Card.m_TradeRange;
-            m_TradeResist += i_Card.m_TradeResist;
-            m_TradeCostReduction += i_Card.m_TradeCostReduction;
-            m_MoveAlfterTrade += i_Card.m_MoveAlfterTrade;
-            m_TradeAdjacent += i_Card.m_TradeAdjacent;
-            m_ArmorAlfterTrade += i_Card.m_ArmorAlfterTrade;
-            m_ShadowAlfterTrade += i_Card.m_ShadowAlfterTrade;
-            m_PushRange += i_Card.m_PushRange;
-            m_PushResist += i_Card.m_PushResist;
-            m_MoveAlfterPush += i_Card.m_MoveAlfterPush;
-            m_LateralPush += i_Card.m_LateralPush;
-            m_ArmorAlfterGettingPushed += i_Card.m_ArmorAlfterGettingPushed;
-            m_ShadowAlfterPush += i_Card.m_ShadowAlfterPush;
-            m_ShadowTime += i_Card.m_ShadowTime;
-            m_ShadowTeleportRange += i_Card.m_ShadowTeleportRange;
-            m_ShadowSightRange += i_Card.m_ShadowSightRange;
+        m_TradeRange += i_Card.m_TradeRange;
+        m_TradeResist += i_Card.m_TradeResist;
+        m_TradeCostReduction += i_Card.m_TradeCostReduction;
+        m_MoveAlfterTrade += i_Card.m_MoveAlfterTrade;
+        m_TradeAdjacent += i_Card.m_TradeAdjacent;
+        m_ArmorAlfterTrade += i_Card.m_ArmorAlfterTrade;
+        m_ShadowAlfterTrade += i_Card.m_ShadowAlfterTrade;
+        m_PushRange += i_Card.m_PushRange;
+        m_PushResist += i_Card.m_PushResist;
+        m_MoveAlfterPush += i_Card.m_MoveAlfterPush;
+        m_LateralPush += i_Card.m_LateralPush;
+        m_ArmorAlfterGettingPushed += i_Card.m_ArmorAlfterGettingPushed;
+        m_ShadowAlfterPush += i_Card.m_ShadowAlfterPush;
+        m_ShadowTime += i_Card.m_ShadowTime;
+        m_ShadowTeleportRange += i_Card.m_ShadowTeleportRange;
+        m_ShadowSightRange += i_Card.m_ShadowSightRange; 
 
-            if (m_ShadowTime > 0)
+        if (m_ShadowTime > 0 && m_TileOccupied)
+        {
+            m_TileOccupied.SetShadow(m_ShadowTime, m_Owner);
+        }
+        UpdateStatsOnCard();
+    }
+
+    public virtual void ZeroCard()
+    {
+
+        m_CastCost = 0;
+        m_ActivateCost = 0;
+
+        m_Attack = 0;
+        m_AttackRange = 0;
+        m_ArmorPercing = 0;
+
+        m_Hp = 0;
+        m_ShadowOnLifeLost = 0;
+
+        m_Mouvement = 0;
+        m_ArmorAlfterMove = 0;
+
+        m_Armor = 0;
+        m_NumberOfSpellToIgnore = 0;
+
+        m_TradeRange = 0;
+        m_TradeResist = 0;
+        m_TradeCostReduction = 0;
+        m_MoveAlfterTrade = 0;
+        m_TradeAdjacent = 0;
+        m_ArmorAlfterTrade = 0;
+        m_ShadowAlfterTrade = 0;
+        m_PushRange = 0;
+        m_PushResist = 0;
+        m_MoveAlfterPush = 0;
+        m_LateralPush = 0;
+        m_ArmorAlfterGettingPushed = 0;
+        m_ShadowAlfterPush = 0;
+        m_ShadowTime = 0;
+        m_ShadowTeleportRange = 0;
+        m_ShadowSightRange = 0;
+
+        m_Renderer.GetComponent<Material>().color = Color.black;
+
+        UpdateStatsOnCard();
+    }
+
+    public virtual void SubstractComponentCard(Card i_Card)
+    {
+        if (m_State == States.InHand)
+        {
+            m_CastCost -= i_Card.m_CastCost;
+            if (m_CastCost < 0)
             {
-                m_TileOccupied.SetShadow(m_ShadowTime, m_Owner);
-            }   
+                m_CastCost = 0;
+            }
+            m_ActivateCost -= i_Card.m_ActivateCost;
+            if (m_ActivateCost < 1)
+            {
+                m_ActivateCost = 1;
+            }
+        }
+        else
+        {
+            m_ActivateCost -= Mathf.Max(Mathf.CeilToInt((i_Card.m_ActivateCost + i_Card.m_CastCost) / 2), 1);
+            if (m_ActivateCost < 1)
+            {
+                m_ActivateCost = 1;
+            }
+        }
+
+        m_Attack -= i_Card.m_Attack;
+        if (m_Attack < 0)
+        {
+            m_Attack = 0;
+        }
+        m_AttackRange -= i_Card.m_AttackRange;
+        if (m_AttackRange < 1)
+        {
+            m_AttackRange = 1;
+        }
+        m_ArmorPercing -= i_Card.m_ArmorPercing;
+        if (m_ArmorPercing < 1)
+        {
+            m_ArmorPercing = 1;
+        }
+
+        m_Hp -= i_Card.m_Hp;
+        if (m_Hp < 0)
+        {
+            m_Hp = 0;
+        }
+        m_ShadowOnLifeLost -= i_Card.m_ShadowOnLifeLost;
+        if (m_ShadowOnLifeLost < 0)
+        {
+            m_ShadowOnLifeLost = 0;
+        }
+
+        m_Mouvement -= i_Card.m_Mouvement;
+        if (m_Mouvement < 0)
+        {
+            m_Mouvement = 0;
+        }
+        m_ArmorAlfterMove -= i_Card.m_ArmorAlfterMove;
+        if (m_ArmorAlfterMove < 0)
+        {
+            m_ArmorAlfterMove = 0;
+        }
+
+        m_Armor -= i_Card.m_Armor;
+        if (m_Armor < 0)
+        {
+            m_Armor = 0;
+        }
+        m_NumberOfSpellToIgnore -= i_Card.m_NumberOfSpellToIgnore;
+        if (m_NumberOfSpellToIgnore < 0)
+        {
+            m_NumberOfSpellToIgnore = 0;
+        }
+
+        m_TradeRange -= i_Card.m_TradeRange;
+        if (m_TradeRange < 0)
+        {
+            m_TradeRange = 0;
+        }
+        m_TradeResist -= i_Card.m_TradeResist;
+        if (m_TradeResist < 0)
+        {
+            m_TradeResist = 0;
+        }
+        m_TradeCostReduction -= i_Card.m_TradeCostReduction;
+        if (m_TradeCostReduction < 0)
+        {
+            m_TradeCostReduction = 0;
+        }
+        m_MoveAlfterTrade -= i_Card.m_MoveAlfterTrade;
+        if (m_MoveAlfterTrade < 0)
+        {
+            m_MoveAlfterTrade = 0;
+        }
+        m_TradeAdjacent -= i_Card.m_TradeAdjacent;
+        if (m_TradeAdjacent < 0)
+        {
+            m_TradeAdjacent = 0;
+        }
+        m_ArmorAlfterTrade -= i_Card.m_ArmorAlfterTrade;
+        if (m_ArmorAlfterTrade < 0)
+        {
+            m_ArmorAlfterTrade = 0;
+        }
+        m_ShadowAlfterTrade -= i_Card.m_ShadowAlfterTrade;
+        if (m_ShadowAlfterTrade < 0)
+        {
+            m_ShadowAlfterTrade = 0;
+        }
+        m_PushRange -= i_Card.m_PushRange;
+        if (m_PushRange < 0)
+        {
+            m_PushRange = 0;
+        }
+        m_PushResist -= i_Card.m_PushResist;
+        if (m_PushResist < 0)
+        {
+            m_PushResist = 0;
+        }
+        m_MoveAlfterPush -= i_Card.m_MoveAlfterPush;
+        if (m_MoveAlfterPush < 0)
+        {
+            m_MoveAlfterPush = 0;
+        }
+        m_LateralPush -= i_Card.m_LateralPush;
+        if (m_LateralPush < 0)
+        {
+            m_LateralPush = 0;
+        }
+        m_ArmorAlfterGettingPushed -= i_Card.m_ArmorAlfterGettingPushed;
+        if (m_ArmorAlfterGettingPushed < 0)
+        {
+            m_ArmorAlfterGettingPushed = 0;
+        }
+        m_ShadowAlfterPush -= i_Card.m_ShadowAlfterPush;
+        if (m_ShadowAlfterPush < 0)
+        {
+            m_ShadowAlfterPush = 0;
+        }
+        m_ShadowTime -= i_Card.m_ShadowTime;
+        if (m_ShadowTime < 0)
+        {
+            m_ShadowTime = 0;
+        }
+        m_ShadowTeleportRange -= i_Card.m_ShadowTeleportRange;
+        if (m_ShadowTeleportRange < 0)
+        {
+            m_ShadowTeleportRange = 0;
+        }
+        m_ShadowSightRange -= i_Card.m_ShadowSightRange;
+        if (m_ShadowSightRange < 0)
+        {
+            m_ShadowSightRange = 0;
         }
         
-
         UpdateStatsOnCard();
     }
 

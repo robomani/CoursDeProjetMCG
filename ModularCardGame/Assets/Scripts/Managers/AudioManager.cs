@@ -26,7 +26,7 @@ public class AudioManager : DontDestroyOnLoad
     [SerializeField]
     private AudioClip[] m_GameMusicList;
 
-    private int m_GameSong = 1;
+    private int m_GameSong = 0;
     private int m_MenuSong = 0;
     private float m_TimeToSwich = 0;
 

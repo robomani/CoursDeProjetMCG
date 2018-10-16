@@ -15,11 +15,22 @@ public class MainMenuUI : MonoBehaviour
     {
         m_RandomDeckSize.gameObject.SetActive(false);
         m_SizeText.enabled = false;
+        AudioManager.Instance.MenuStart();
     }
 
     public void StartGame()
     {
         LevelManager.Instance.ChangeLevel("Game");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void DeckCreation()
+    {
+        LevelManager.Instance.ChangeLevel("DeckCreation");
     }
 
     public void ToggleAICheatMode()
