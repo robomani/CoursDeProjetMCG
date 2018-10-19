@@ -12,6 +12,7 @@ public class TileController : MonoBehaviour
     public GameObject m_AttackRangeVisual;
     public GameObject m_Avatar = null;
     public GameObject m_ShadowEffect;
+    public GameObject m_Borders;
 
     private Renderer m_Renderer;
     private Color m_Color;
@@ -20,6 +21,7 @@ public class TileController : MonoBehaviour
     private Card.Players m_Owner;
     private Vector3 m_baseShadowPosition;
     private Vector3 m_currentShadowPosition;
+
 
     #region SpellVariables
     private int m_SpellTurnDuration = 0;
@@ -57,7 +59,7 @@ public class TileController : MonoBehaviour
 
     public void Illuminate()
     {
-        m_Renderer.material.SetColor("_Color", Color.green);
+        m_Borders.SetActive(true);
         m_IsValid = true;
     }
 
@@ -69,7 +71,7 @@ public class TileController : MonoBehaviour
 
     public void UnIlluminate()
     {
-        m_Renderer.material.SetColor("_Color", m_Color);
+        m_Borders.SetActive(false);
         m_IsValid = false;
         m_IsValidTarget = false;
         m_AttackRangeVisual.SetActive(false);
@@ -146,10 +148,12 @@ public class TileController : MonoBehaviour
             m_ArmorPercing = 0;
             m_ArmorPerTurn = 0;
             m_SpellOwner = Card.Players.None;
+            m_Renderer.material.SetColor("_Color", m_Color);
         }
         else
         {
             SpellEffects();
+            m_Renderer.material.SetColor("_Color", Color.blue);
         } 
 
         if (m_ShadowTime > 0)
@@ -172,8 +176,14 @@ public class TileController : MonoBehaviour
         SpellDamage();
         SpellTrade();
         SpellPush();
+    }
 
-        
+    public void AddEffectToCard()
+    {
+        if (m_OccupiedBy && m_ArmorPerTurn > 0)
+        {
+            m_OccupiedBy.AddTemporaryArmor(m_ArmorPerTurn);
+        }
     }
 
     private void SpellDamage()

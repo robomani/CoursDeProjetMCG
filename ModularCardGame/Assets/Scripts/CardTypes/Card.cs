@@ -243,6 +243,7 @@ public class Card : MonoBehaviour
     }
     #endregion
 
+    private int m_TemporaryArmor = 0;
 
     protected virtual void Awake()
     {
@@ -391,7 +392,7 @@ public class Card : MonoBehaviour
         }
     }
 
-    public void CopyCard(Card i_Card)
+    public virtual void CopyCard(Card i_Card)
     {
         string HabilityListText = "";
 
@@ -548,8 +549,11 @@ public class Card : MonoBehaviour
 
     public bool LoseHp(int i_Damage, int i_ArmorPercing = 0)
     {
-        
         m_Hp -= (i_Damage - Mathf.Max((m_Armor - i_ArmorPercing),0));
+        if (m_TemporaryArmor > 0)
+        {
+            m_Armor -= m_TemporaryArmor;
+        }
         if (m_Hp <= 0)
         {
             AnimHurt(true);
@@ -854,6 +858,12 @@ public class Card : MonoBehaviour
                 DestroyCharacter();
             }
         }
+    }
+
+    public void AddTemporaryArmor(int i_ArmorAmount)
+    {
+        m_Armor += i_ArmorAmount;
+        m_TemporaryArmor += i_ArmorAmount;
     }
 
     public void Flash(Color i_Color, float i_Time)
