@@ -422,6 +422,16 @@ Prefab:
       propertyPath: m_Name
       value: TileMaya (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosX
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
   m_IsPrefabParent: 0
@@ -4009,6 +4019,8 @@ MonoBehaviour:
   m_Altars:
   - {fileID: 231615462}
   - {fileID: 1760387925}
+  m_Row: 3
+  m_Column: 5
 --- !u!4 &1135032809
 Transform:
   m_ObjectHideFlags: 0
@@ -4718,6 +4730,11 @@ Prefab:
       propertyPath: m_TagString
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
   m_IsPrefabParent: 0
@@ -5059,9 +5076,10 @@ Prefab:
       propertyPath: m_Name
       value: TileMaya (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 1744303577731036, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
-      propertyPath: m_TagString
-      value: Tile
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosX
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
@@ -5475,6 +5493,11 @@ Prefab:
       propertyPath: m_TagString
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
   m_IsPrefabParent: 0
@@ -5659,6 +5682,11 @@ Prefab:
     - target: {fileID: 1744303577731036, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
       propertyPath: m_TagString
       value: Tile
+      objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
@@ -6261,6 +6289,11 @@ Prefab:
       propertyPath: m_TagString
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
   m_IsPrefabParent: 0
@@ -6722,6 +6755,11 @@ Prefab:
       propertyPath: m_TagString
       value: Tile
       objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosX
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
   m_IsPrefabParent: 0
@@ -7035,6 +7073,16 @@ Prefab:
     - target: {fileID: 4440412475997544, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}
       propertyPath: m_RootOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114957117388522510, guid: 8edf6afd47eea964dadb19d3479a410b,
+        type: 2}
+      propertyPath: PosY
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8edf6afd47eea964dadb19d3479a410b, type: 2}

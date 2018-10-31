@@ -713,7 +713,6 @@ public class GameController : MonoBehaviour
                                     break;
                                 }
                             }
-
                             if (endLoop)
                             {
                                 break;
@@ -763,7 +762,6 @@ public class GameController : MonoBehaviour
                                 break;
                             }
                         }
-
                     }
                     endLoop = true;
                 }
@@ -801,7 +799,6 @@ public class GameController : MonoBehaviour
                                 break;
                             }
                         }
-
                     }
                     endLoop = true;
                 }
@@ -1169,8 +1166,68 @@ public class GameController : MonoBehaviour
             TileController tile = null;
             TileController selected = i_Card.m_TileOccupied;
             int range = i_Card.Movement;
+            int tempRange;
             int attackRange = i_Card.AttackRange;
+            int tempAttackRange;
 
+            for (int x = 1; x < Mathf.Max(range, attackRange); x++)
+            {
+                tempAttackRange = attackRange - x;
+                tempRange = range - x;
+
+                if (selected.PosX - x >= 0)
+                {
+                    if (tempAttackRange >= 0)
+                    {
+                        m_Board.m_Tiles[((selected.PosX - x) * m_Board.m_Row) + selected.PosY].GetComponent<TileController>().InAttackRange();
+                    }
+                    if (tempRange >= 0)
+                    {
+                        m_Board.m_Tiles[((selected.PosX - x) * m_Board.m_Row) + selected.PosY].GetComponent<TileController>().Illuminate();
+                    }
+                }
+
+                if (selected.PosX + x < m_Board.m_Column)
+                {
+                    if (selected.PosX + x < m_Board.m_Column && tempAttackRange >= 0)
+                    {
+                        m_Board.m_Tiles[((selected.PosX + x) * m_Board.m_Row) + selected.PosY].GetComponent<TileController>().InAttackRange();
+                    }
+                    if (selected.PosX + x < m_Board.m_Column && tempRange >= 0)
+                    {
+                        m_Board.m_Tiles[((selected.PosX + x) * m_Board.m_Row) + selected.PosY].GetComponent<TileController>().Illuminate();
+                    }
+                }
+            }
+            /*
+            for (int x = 0; x < m_Board.m_Column; x++)
+            {
+                if (x < selected.PosX)
+                {
+                    if (true)
+                    {
+                        inRange = true;
+                    }
+                    int tempMove = selected.PosX - (x + range);
+                    int tempAttack = x - (selected.PosX + attackRange);
+                }
+                else if (x > selected.PosX)
+                {
+                    int tempMove = Math.Max(x - (selected.PosX + range));
+                    int tempAttack = Math.Max(x - (selected.PosX + attackRange));
+                }
+                else
+                {
+                    int tempMove = Math.Max(x - (selected.PosX + range));
+                    int tempAttack = Math.Max(x - (selected.PosX + attackRange));
+                }
+
+                for (int y = 0; y < m_Board.m_Row; y++)
+                {
+
+                }
+            }
+            
             for (int i = 0; i < m_Board.m_Tiles.Length; i++)
             {
                 tile = m_Board.m_Tiles[i].GetComponent<TileController>();
@@ -1224,6 +1281,7 @@ public class GameController : MonoBehaviour
                     }
                 }
             }
+            */
             if(selected.PosX + attackRange >= 5 && i_Card.m_Owner == Card.Players.Player)
             {
                 m_AltarAI.InAttackRange();
@@ -1400,9 +1458,9 @@ public class GameController : MonoBehaviour
     {
         for (int i = 0; i < m_PlayerHand.Length; i++)
         {
+            ChangePlayerMana(m_PlayerHand[i].GetComponent<Card>().CastingCost);
             m_SelectedCard = m_PlayerHand[i].GetComponent<Card>();
             DiscardCard();
-            ChangePlayerMana(m_SelectedCard.CastingCost);
         }
     }
 
