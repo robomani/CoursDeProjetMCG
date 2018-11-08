@@ -1969,7 +1969,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 487679856}
+      - m_Target: {fileID: 994904354}
         m_MethodName: StopWaitingForMulligan
         m_Mode: 1
         m_Arguments:
@@ -2057,7 +2057,7 @@ MonoBehaviour:
   m_PlayerHpText: {fileID: 932433199}
   m_PlayerMaxMana: 1
   m_PlayerManaText: {fileID: 1100118267}
-  m_HpAI: 20
+  m_AIHp: 20
   m_HpAIText: {fileID: 1328605320}
   m_AIMaxMana: 1
   m_ManaAIText: {fileID: 1526812031}
@@ -2145,8 +2145,10 @@ MonoBehaviour:
   m_CardData: {fileID: 11400000, guid: 5803d4f1ea2d7da4d880e93cb43c4f16, type: 2}
   m_AltarAI: {fileID: 1760387926}
   m_AltarPlayer: {fileID: 1509246817}
+  m_IsCheating: 0
   m_MainCamera: {fileID: 1677651148}
   m_ZoomCamera: {fileID: 881193882}
+  m_AIController: {fileID: 0}
 --- !u!4 &487679857
 Transform:
   m_ObjectHideFlags: 0
@@ -2387,7 +2389,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 487679856}
+      - m_Target: {fileID: 994904354}
         m_MethodName: StopWaitingForMulligan
         m_Mode: 1
         m_Arguments:
@@ -2826,9 +2828,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Position: 0
   m_TileOccupied: {fileID: 0}
+  m_Game: {fileID: 0}
   m_CardName: 
   m_Playable: 1
   m_ValidTarget: 0
+  m_MoveTime: 1.5
   m_Owner: 1
   m_CostText: {fileID: 1241014843}
   m_AttackText: {fileID: 1817359548}
@@ -3642,6 +3646,47 @@ Transform:
   m_Father: {fileID: 487679857}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &994904353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 994904355}
+  - component: {fileID: 994904354}
+  m_Layer: 0
+  m_Name: InputController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &994904354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 994904353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87cd58df56e42ec44bbb2aea24813160, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Game: {fileID: 487679856}
+--- !u!4 &994904355
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 994904353}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -74.03592, y: -59.708443, z: 9.079544}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1032072218
 GameObject:
   m_ObjectHideFlags: 0

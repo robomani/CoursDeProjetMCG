@@ -955,15 +955,14 @@ public class Card : MonoBehaviour
         AnimWalk();     
 
         yield return new WaitForSeconds(0.2f);
-        float value;
-
+        float value = 0.0f;
+        m_MoveTime = 1.5f;
         LookFoward CharPos = null;
 
         if (transform.GetComponentInChildren<LookFoward>())
         {
             CharPos = transform.GetComponentInChildren<LookFoward>();
         }
-
         while (currentTime != m_MoveTime)
         {
             currentTime += Time.deltaTime;
@@ -1014,8 +1013,7 @@ public class Card : MonoBehaviour
             else
             {
                 m_Game.AIGrave[System.Array.IndexOf(m_Game.AIGrave, null)] = i_Target.gameObject;
-                m_Game.SelectedCard = null;
-                m_Game.ShowNormalTiles();
+                m_Game.ShowNormalTiles(this);
             }
 
             i_Target.m_TileOccupied.ClearTile();

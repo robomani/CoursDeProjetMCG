@@ -16,10 +16,6 @@ public struct CardClass
 
 public class GameController : MonoBehaviour
 {
-#if UNITY_CHEAT
-    private bool m_IsCheating = false;
-#endif
-
     #region Variables
 
     #region Player Base Stats
@@ -29,6 +25,7 @@ public class GameController : MonoBehaviour
     public int PlayerHp
     {
         get { return m_PlayerHp; }
+        set { m_PlayerHp = value; }
     }
 
     [Tooltip("Le texte qui affiche le nombre de vie du joueur")]
@@ -73,6 +70,7 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI m_ManaAIText;
 
+    //---------------------------------------------------------------------------------------------------------
     [Tooltip("Détermine si l'IA utilise le mode CHEAT!")]
     [SerializeField]
     private bool m_AICheatMode;
@@ -81,7 +79,6 @@ public class GameController : MonoBehaviour
     #region Card Move Speed
     [Tooltip("Vitesse de mouvement des cartes des deck aux mains")]
     [SerializeField]
-
     private float m_DrawTime = 1.5f;
     public float DrawTime
     {
@@ -125,6 +122,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Le transform de la rotation des cartes du joueur sur une case")]
     [SerializeField]
     private Transform m_PlayerTileRotation;
+    public Transform PlayerTileRotation
+    {
+        get { return m_PlayerTileRotation; }
+    }
 
     [Tooltip("Le transform de la position du deck de l'IA")]
     [SerializeField]
@@ -146,6 +147,10 @@ public class GameController : MonoBehaviour
     [Tooltip("La carte qui prend l'apparence de la carte sur laquelle le joueur zoom")]
     [SerializeField]
     private GameObject m_ZoomCard;
+    public GameObject ZoomCard
+    {
+        get { return m_ZoomCard; }
+    }
 
     #region Reference des boutons
     [Tooltip("Le bouton qui permet de discarter la carte selectionnée")]
@@ -229,52 +234,43 @@ public class GameController : MonoBehaviour
     }
 
     private bool m_PlayerAvatarActive = false;
-    private bool m_WaitForMulligan = true;
-    public bool WaitForMulligan
-    {
-        get { return m_WaitForMulligan; }
-    }
-    private bool m_TurnAI = false;
-    public bool TurnAI
-    {
-        get { return m_TurnAI; }
-    }
+
     private Card.Players m_TurnOwner = Card.Players.Player;
     public Card.Players TurnOwner
     {
         get { return m_TurnOwner; }
     }
+
     private int m_PlayerMana = 1;
     public int PlayerMana
     {
         get { return m_PlayerMana; }
         set { m_PlayerMana = value; UpdateTexts(); }
     }
+
     private int m_AIMana = 1;
     public int AIMana
     {
         get { return m_AIMana; }
         set { m_AIMana = value;  UpdateTexts(); }
     }
+
+    private bool m_TurnAI = false;
+    public bool TurnAI
+    {
+        get { return m_TurnAI; }
+    }
+
+    public bool m_IsCheating;
+
     private int[] m_CardNumberByType;
     private int[] m_AICardNumberByType;
-    private Ray m_RayPlayerHand;
-    private Card m_LastCard = null;
-    public Card LastCard
-    {
-        get { return m_LastCard; }
-        set { m_LastCard = value; }
-    }
-    private Card m_SelectedCard = null;
-    public Card SelectedCard
-    {
-        get { return m_SelectedCard; }
-        set { m_SelectedCard = value; }
-    }
-    private Vector3 m_TempPosition;
 
     public Camera m_MainCamera;
     public Camera m_ZoomCamera;
+
+    [SerializeField]
+    private AIController m_AIController;
     #endregion
 
     public static Action ChangeTurn;
@@ -332,209 +328,6 @@ public class GameController : MonoBehaviour
         return countCardToAdd;
     }
 
-    private void Update()
-    {
-        if (m_PlayerHp <= 0 || m_AIHp <= 0)
-        {
-            GameEnd(m_AIHp > 0 ? false : true);
-        }
-
-        if (!m_MainCamera.enabled)
-        {
-            if (Input.GetButtonDown("Zoom"))
-            {
-                Zoom(false);
-            }
-        }
-        else
-        {
-            m_RayPlayerHand = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit HitInfo;
-            RaycastHit TileHitInfo;
-            if (m_TurnOwner == Card.Players.Player && !m_WaitForMulligan)
-            {
-                Debug.DrawRay(m_RayPlayerHand.origin, m_RayPlayerHand.direction);
-
-                if (Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar AI")))
-                {
-                    if (Input.GetButtonDown("Select") && TileHitInfo.transform.GetComponentInParent<TileController>().m_IsValidTarget && m_SelectedCard != null)
-                    {
-                        SelectedCardAttackAIAvatar();
-                    }
-                }
-                else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f, LayerMask.GetMask("Card")))
-                {
-                    Card CardOver = HitInfo.transform.GetComponent<Card>();
-                    if (m_LastCard != null && m_LastCard != CardOver && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
-                    {
-                        m_LastCard.UnIlluminate();
-                    }
-
-                    if (Input.GetButtonDown("Select") && m_SelectedCard != null && m_SelectedCard.CardType == CardType.Component && CardOver.m_ValidTarget)
-                    {
-                        SelectedComponentAddToCard(CardOver);
-                    }
-                    else if (Input.GetButtonDown("Select") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay) && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
-                    {
-                        if (m_SelectedCard != CardOver && ((CardOver.State == Card.States.InHand && CardOver.CastingCost <= m_PlayerMana) || (CardOver.State == Card.States.InPlay && CardOver.ActivateCost <= m_PlayerMana)))
-                        {
-                            if (m_SelectedCard != null)
-                            {
-                                m_SelectedCard.UnIlluminate();
-                            }
-                            m_SelectedCard = CardOver;
-
-                            if (m_SelectedCard.State == Card.States.InHand)
-                            {
-                                showButtonDiscard(true);
-                            }
-                            ShowNormalTiles();
-                            m_SelectedCard.SelectedColor();
-                            ShowValidTiles(m_SelectedCard);
-                        }
-                        else
-                        {
-                            ShowNormalCards();
-                            if (m_SelectedCard != null)
-                            {
-                                m_SelectedCard.UnIlluminate();
-                            }
-                            ShowNormalTiles();
-                            m_SelectedCard = null;
-                            m_BtnDiscard.SetActive(false);
-                        }
-
-                    }
-                    else if (Input.GetButtonDown("Select") && CardOver.State == Card.States.InPlay && CardOver.m_ValidTarget)
-                    {
-                        AttackCard(m_SelectedCard, CardOver);
-                    }
-
-
-                    if (Input.GetButtonDown("Zoom") && (CardOver.State == Card.States.InHand || CardOver.State == Card.States.InPlay))
-                    {
-                        Zoom(true, CardOver);
-                    }
-
-                    if (m_SelectedCard != CardOver && CardOver != m_ZoomCard.GetComponent<Card>() && CardOver.m_Owner == m_TurnOwner && CardOver.m_Playable)
-                    {
-                        if (m_SelectedCard == null || m_SelectedCard.CardType != CardType.Component)
-                        {
-                            CardOver.Illuminate();
-                        }
-                    }
-
-                    if (m_SelectedCard == null && ((CardOver.State != Card.States.InDeck && CardOver.State != Card.States.InGrave) && ((CardOver.State == Card.States.InPlay && CardOver.m_Owner == Card.Players.AI) || CardOver.m_Owner == Card.Players.Player)))
-                    {
-                        ShowValidTiles(CardOver);
-                    }
-                    m_LastCard = CardOver;
-                }
-                else
-                {
-                    if (m_LastCard != null && m_LastCard != m_SelectedCard && m_LastCard.m_Owner == m_TurnOwner && m_LastCard.m_Playable)
-                    {
-                        m_LastCard.UnIlluminate();
-                        m_LastCard.m_CardName = "";
-                    }
-
-                    if (m_SelectedCard == null)
-                    {
-                        ShowNormalTiles();
-                    }
-
-                    if (Input.GetButtonDown("Zoom"))
-                    {
-                        Zoom(false);
-                    }
-                }
-
-                if (Input.GetButtonDown("Select") && m_SelectedCard != null && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Tiles")) && TileHitInfo.transform.GetComponent<TileController>().m_IsValid)
-                {
-                    m_TempPosition = TileHitInfo.transform.position;
-                    if (m_SelectedCard.ShadowTime > 0)
-                    {
-                        TileHitInfo.transform.GetComponent<TileController>().SetShadow(m_SelectedCard.ShadowTime, m_SelectedCard.m_Owner);
-                    }
-                    StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_TempPosition, m_SelectedCard.transform.rotation, m_PlayerTileRotation.rotation, m_DiscardTime));
-                    if (m_SelectedCard.State == Card.States.InHand)
-                    {
-                        if (m_SelectedCard.CardType == CardType.Spell)
-                        {
-                            CastSpell(TileHitInfo.transform.GetComponent<TileController>());
-                        }
-                        else
-                        {
-                            SelectedCardToInPlayState();
-                        }    
-                    }
-                    else
-                    {
-                        m_SelectedCard.m_TileOccupied.m_OccupiedBy = null;
-                        ChangePlayerMana(-m_SelectedCard.ActivateCost);
-                    }
-                    if (m_SelectedCard)
-                    {
-                        SelectedCardToBoard(TileHitInfo.transform.GetComponent<TileController>());
-                    }     
-                }
-
-                if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_PlayerMana > 0)
-                {
-                    ActivatePlayerAvatar();
-                }
-#if UNITY_CHEAT
-                if (Input.GetButtonDown("Cheat"))
-                {
-                    DrawCard();
-                    ChangePlayerMana(10);
-                    m_PlayerHp += 1;
-                }
-                if (Input.GetKeyDown(KeyCode.D))
-                {
-                    DrawCard();
-                }
-                if (Input.GetKeyDown(KeyCode.A))
-                {
-                    ChangePlayerMana(10);
-                }
-                if (Input.GetKeyDown(KeyCode.S))
-                {
-                    m_PlayerHp += 1;
-                }
-                if (Input.GetKeyDown(KeyCode.F))
-                {
-                    if (m_IsCheating)
-                    {
-                        m_IsCheating = false;
-                        m_AltarPlayer.GetComponent<Renderer>().material.color = Color.white;
-                    }
-                    else
-                    {
-                        m_IsCheating = true;
-                        m_AltarPlayer.GetComponent<Renderer>().material.color = Color.yellow;
-                    }
-                }
-#endif
-            }
-            else if (m_TurnOwner == Card.Players.AI && !m_WaitForMulligan)
-            {
-
-            }
-        }
-        if (m_SelectedCard != null)
-        {
-            ShowValidTiles(m_SelectedCard);
-        }
-        UpdateTexts();
-#if UNITY_CHEAT
-        if (m_IsCheating)
-        {
-            m_AltarPlayer.GetComponent<Renderer>().material.color = Color.yellow;
-        }
-#endif
-    }
-
     public void HurtPlayer(int i_Damage)
     {
 #if UNITY_CHEAT
@@ -553,7 +346,7 @@ public class GameController : MonoBehaviour
         m_AIHp -= i_Damage;
         AnimationManager.Instance.EnemyHurt();
     }
-
+/*
     public void AttackCard(Card i_Attacker, Card i_Target)
     {
         if (i_Target.LoseHp(i_Attacker.Attack))
@@ -569,7 +362,6 @@ public class GameController : MonoBehaviour
                 StartCoroutine(CardMove(i_Target.transform, i_Target.transform.position, m_AIGravePosition.position, i_Target.transform.rotation, m_AIGravePosition.rotation, m_DiscardTime));
                 ChangePlayerMana(-i_Attacker.ActivateCost);
                 m_AIGrave[System.Array.IndexOf(m_AIGrave, null)] = i_Target.gameObject;
-                m_SelectedCard = null;
                 ShowNormalTiles();
             }
 
@@ -1036,7 +828,7 @@ public class GameController : MonoBehaviour
         m_TurnAI = false;
         EndTurn();
     }
-
+*/
     public void EndTurn()
     {
         if (m_TurnAI)
@@ -1051,11 +843,11 @@ public class GameController : MonoBehaviour
             m_TurnAI = true;
             if (m_AICheatMode)
             {
-                StartCoroutine(AICheatTurn());
+                //m_AIController.StartCoroutine(m_AIController.AICheatTurn());
             }
             else
             {
-                StartCoroutine(AiTurn());
+                //m_AIController.StartCoroutine(m_AIController.AiTurn());
             }
             
             if (ChangeTurn != null)
@@ -1102,11 +894,11 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void ShowNormalCards()
+    public void ShowNormalCards(Card i_SelectedCard = null)
     {
         for (int i = 0; i < 7; i++)
         {
-            if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>() != m_SelectedCard)
+            if (m_PlayerHand[i] != null && m_PlayerHand[i].GetComponent<Card>() != i_SelectedCard)
             {
                 if (m_PlayerHand[i].GetComponent<Card>().m_Playable)
                 {
@@ -1121,7 +913,7 @@ public class GameController : MonoBehaviour
 
         for (int i = 0; i < 15; i++)
         {
-            if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != m_SelectedCard)
+            if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != null && m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy != i_SelectedCard)
             {
                 if (m_Board.m_Tiles[i].GetComponent<TileController>().m_OccupiedBy.m_Playable)
                 {
@@ -1189,13 +981,14 @@ public class GameController : MonoBehaviour
             //TODO:: Start a coroutine that flash the mana counter of the player and the PowerDrawButon
         }
     }
-
+    /*
     public void StopWaitingForMulligan()
     {
         m_WaitForMulligan = false;
     }
+    */
 
-    public void ShowValidTiles(Card i_Card)
+    public void ShowValidTiles(Card i_Card = null)
     {
         if (i_Card.CardType == CardType.Component)
         {
@@ -1374,7 +1167,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void ShowNormalTiles()
+    public void ShowNormalTiles(Card i_SelectedCard)
     {
         for (int x = 0; x < m_Board.m_Tiles.Length; x++)
         {
@@ -1387,7 +1180,7 @@ public class GameController : MonoBehaviour
         m_AltarAI.UnIlluminate();
         m_AltarPlayer.UnIlluminate();
 
-        ShowNormalCards();
+        ShowNormalCards(i_SelectedCard);
     }
 
     public void Cast(int i_ManaCost)
@@ -1518,19 +1311,18 @@ public class GameController : MonoBehaviour
         AIDrawCard();       
     }
 
-    public void DiscardCard()
+    public void DiscardCard(Card i_SelectedCard)
     {
-        if (m_SelectedCard != null)
+        if (i_SelectedCard != null)
         {
-            m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = m_SelectedCard.gameObject;
-            StartCoroutine(CardMove(m_SelectedCard.transform, m_SelectedCard.transform.position, m_PlayerGravePosition.position, m_SelectedCard.transform.rotation, m_PlayerGravePosition.rotation, m_DiscardTime));
-            m_SelectedCard.ChangeState(Card.States.InGrave);
-            m_PlayerHand[m_SelectedCard.m_Position] = null;
+            m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = i_SelectedCard.gameObject;
+            i_SelectedCard.StartCoroutine(i_SelectedCard.CardMove(m_PlayerGravePosition.position, m_PlayerGravePosition.rotation));
+            i_SelectedCard.ChangeState(Card.States.InGrave);
+            m_PlayerHand[i_SelectedCard.m_Position] = null;
             m_ZoomCard.SetActive(false);
-            ChangePlayerMana(-m_SelectedCard.CastingCost);
-            m_SelectedCard = null;
+            ChangePlayerMana(-i_SelectedCard.CastingCost);
             DrawCard();
-            ShowNormalTiles();
+            ShowNormalTiles(i_SelectedCard);
         }
         CheckPlayableCard();
     }
@@ -1540,8 +1332,7 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < m_PlayerHand.Length; i++)
         {
             ChangePlayerMana(m_PlayerHand[i].GetComponent<Card>().CastingCost);
-            m_SelectedCard = m_PlayerHand[i].GetComponent<Card>();
-            DiscardCard();
+            DiscardCard(m_PlayerHand[i].GetComponent<Card>());
         }
     }
 
@@ -1777,59 +1568,58 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void SelectedCardAttackAIAvatar()
+    public void SelectedCardAttackAIAvatar(Card i_SelectedCard)
     {
-        ChangePlayerMana(-m_SelectedCard.ActivateCost);
-        HurtEnemy(m_SelectedCard.Attack);
-        m_SelectedCard.UnIlluminate();
-        m_SelectedCard = null;
-        ShowNormalTiles();
+        ChangePlayerMana(-i_SelectedCard.ActivateCost);
+        HurtEnemy(i_SelectedCard.Attack);
+        i_SelectedCard.UnIlluminate();
+        i_SelectedCard = null;
+        ShowNormalTiles(i_SelectedCard);
     }
 
-    public void SelectedComponentAddToCard(Card i_CardOver)
+    public void SelectedComponentAddToCard(Card i_CardOver, Card i_SelectedCard)
     {
-        ChangePlayerMana(-m_SelectedCard.CastingCost);
-        i_CardOver.AddComponentCard(m_SelectedCard);
+        ChangePlayerMana(-i_SelectedCard.CastingCost);
+        i_CardOver.AddComponentCard(i_SelectedCard);
         m_BtnDiscard.SetActive(false);
-        Destroy(m_SelectedCard.gameObject);
-        m_SelectedCard = null;
-        ShowNormalTiles();
+        Destroy(i_SelectedCard.gameObject);
+        ShowNormalTiles(i_SelectedCard);
         CheckPlayableCard();
     }
 
-    public void showButtonDiscard(bool i_Activate)
+    public void showButtonDiscard(bool i_Activate, Card i_SelectedCard)
     {
         m_BtnDiscard.SetActive(i_Activate);
-        Vector3 temp = m_SelectedCard.transform.position;
+        Vector3 temp = i_SelectedCard.transform.position;
         temp.y += 1f;
         temp.x -= 2.5f;
         temp.z -= 0.75f;
         m_BtnDiscard.transform.position = temp;
     }
 
-    public void SelectedCardToInPlayState()
+    public void SelectedCardToInPlayState(Card i_SelectedCard)
     {
-        m_SelectedCard.ChangeState(Card.States.InPlay);
-        m_PlayerHand[m_SelectedCard.m_Position] = null;
-        m_SelectedCard.m_Position = -1;
-        ChangePlayerMana(-m_SelectedCard.CastingCost);
+        i_SelectedCard.ChangeState(Card.States.InPlay);
+        m_PlayerHand[i_SelectedCard.m_Position] = null;
+        i_SelectedCard.m_Position = -1;
+        ChangePlayerMana(-i_SelectedCard.CastingCost);
     }
 
-    public void SelectedCardToBoard(TileController i_Tile)
+    public void SelectedCardToBoard(TileController i_Tile, Card i_SelectedCard)
     {
-        m_SelectedCard.m_TileOccupied = i_Tile;
-        i_Tile.m_OccupiedBy = m_SelectedCard;
+        i_SelectedCard.m_TileOccupied = i_Tile;
+        i_Tile.m_OccupiedBy = i_SelectedCard;
         m_BtnDiscard.SetActive(false);
-        ShowNormalTiles();
+        ShowNormalTiles(i_SelectedCard);
         CheckPlayableCard();
     }
 
-    public void CastSpell(TileController i_Tile)
+    public void CastSpell(TileController i_Tile, Card i_SelectedCard)
     {
-        i_Tile.AddSpellEffects(m_SelectedCard);
+        i_Tile.AddSpellEffects(i_SelectedCard);
         m_BtnDiscard.SetActive(false);
-        DiscardCard();
-        ShowNormalTiles();
+        DiscardCard(i_SelectedCard);
+        ShowNormalTiles(i_SelectedCard);
         CheckPlayableCard();
     }
 }
