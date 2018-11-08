@@ -26,6 +26,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Nombre de vie de base du joueur")]
     [SerializeField]
     private int m_PlayerHp = 20;
+    public int PlayerHp
+    {
+        get { return m_PlayerHp; }
+    }
 
     [Tooltip("Le texte qui affiche le nombre de vie du joueur")]
     [SerializeField]
@@ -34,6 +38,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Nombre de Mana Maximum du joueur")]
     [SerializeField]
     private int m_PlayerMaxMana = 1;
+    public int PlayerMaxMana
+    {
+        get { return m_PlayerMaxMana; }
+    }
 
     [Tooltip("Le texte qui affiche le nombre de mana du joueur")]
     [SerializeField]
@@ -43,7 +51,11 @@ public class GameController : MonoBehaviour
     #region AI Base Stats
     [Tooltip("Nombre de vie de base de l'IA")]
     [SerializeField]
-    private int m_HpAI = 20;
+    private int m_AIHp = 20;
+    public int HpAI
+    {
+        get { return m_AIHp; }
+    }
 
     [Tooltip("Le texte qui affiche le nombre de vie de l'IA")]
     [SerializeField]
@@ -52,6 +64,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Nombre de Mana Maximum de l'IA")]
     [SerializeField]
     private int m_AIMaxMana = 1;
+    public int AIMaxMana
+    {
+        get { return m_AIMaxMana; }
+    }
 
     [Tooltip("Le texte qui affiche le nombre de mana de l'IA")]
     [SerializeField]
@@ -67,13 +83,26 @@ public class GameController : MonoBehaviour
     [SerializeField]
 
     private float m_DrawTime = 1.5f;
+    public float DrawTime
+    {
+        get { return m_DrawTime; }
+    }
+
     [Tooltip("Vitesse de mouvement des cartes des mains aux cimetières")]
     [SerializeField]
     private float m_DiscardTime = 1.5f;
+    public float DiscardTime
+    {
+        get { return m_DiscardTime; }
+    }
 
     [Tooltip("Vitesse de mouvement des cartes des cimetières aux decks")]
     [SerializeField]
     private float m_ShuffleTime = 1.5f;
+    public float ShuffleTime
+    {
+        get { return m_ShuffleTime; }
+    }
     #endregion
 
     [Tooltip("Le préfab des cartes à instancier")]
@@ -122,6 +151,10 @@ public class GameController : MonoBehaviour
     [Tooltip("Le bouton qui permet de discarter la carte selectionnée")]
     [SerializeField]
     private GameObject m_BtnDiscard;
+    public GameObject BtnDiscard
+    {
+        get { return m_BtnDiscard; }
+    }
 
     [Tooltip("Le bouton qui augmente la mana maximum du joueur")]
     [SerializeField]
@@ -165,29 +198,79 @@ public class GameController : MonoBehaviour
     private CardsData m_CardData;
     [SerializeField]
     private TileController m_AltarAI;
+    public TileController AltarAI
+    {
+        get { return m_AltarAI; }
+    }
     [SerializeField]
     private TileController m_AltarPlayer;
+    public TileController AltarPlayer
+    {
+        get { return m_AltarPlayer; }
+    }
 
     private GameObject[] m_PlayerHand;
     private GameObject[] m_PlayerDeck;
     private GameObject[] m_PlayerGrave;
+    public GameObject[] PlayerGrave
+    {
+        get { return m_PlayerGrave; }
+        set { m_PlayerGrave = value;}
+    }
 
     private GameObject[] m_AIHand;
     private GameObject[] m_AIDeck;
     private List<GameObject> m_AIInPlay = null;
     private GameObject[] m_AIGrave;
+    public GameObject[] AIGrave
+    {
+        get { return m_AIGrave; }
+        set { m_AIGrave = value;}
+    }
 
     private bool m_PlayerAvatarActive = false;
     private bool m_WaitForMulligan = true;
+    public bool WaitForMulligan
+    {
+        get { return m_WaitForMulligan; }
+    }
     private bool m_TurnAI = false;
+    public bool TurnAI
+    {
+        get { return m_TurnAI; }
+    }
     private Card.Players m_TurnOwner = Card.Players.Player;
+    public Card.Players TurnOwner
+    {
+        get { return m_TurnOwner; }
+    }
     private int m_PlayerMana = 1;
+    public int PlayerMana
+    {
+        get { return m_PlayerMana; }
+        set { m_PlayerMana = value; UpdateTexts(); }
+    }
     private int m_AIMana = 1;
+    public int AIMana
+    {
+        get { return m_AIMana; }
+        set { m_AIMana = value;  UpdateTexts(); }
+    }
     private int[] m_CardNumberByType;
     private int[] m_AICardNumberByType;
     private Ray m_RayPlayerHand;
     private Card m_LastCard = null;
+    public Card LastCard
+    {
+        get { return m_LastCard; }
+        set { m_LastCard = value; }
+    }
     private Card m_SelectedCard = null;
+    public Card SelectedCard
+    {
+        get { return m_SelectedCard; }
+        set { m_SelectedCard = value; }
+    }
     private Vector3 m_TempPosition;
 
     public Camera m_MainCamera;
@@ -249,13 +332,11 @@ public class GameController : MonoBehaviour
         return countCardToAdd;
     }
 
-
-
     private void Update()
     {
-        if (m_PlayerHp <= 0 || m_HpAI <= 0)
+        if (m_PlayerHp <= 0 || m_AIHp <= 0)
         {
-            GameEnd(m_HpAI > 0 ? false : true);
+            GameEnd(m_AIHp > 0 ? false : true);
         }
 
         if (!m_MainCamera.enabled)
@@ -454,7 +535,7 @@ public class GameController : MonoBehaviour
 #endif
     }
 
-    private void HurtPlayer(int i_Damage)
+    public void HurtPlayer(int i_Damage)
     {
 #if UNITY_CHEAT
         if (!m_IsCheating)
@@ -467,13 +548,13 @@ public class GameController : MonoBehaviour
         AnimationManager.Instance.PlayerHurt();
     }
 
-    private void HurtEnemy(int i_Damage)
+    public void HurtEnemy(int i_Damage)
     {
-        m_HpAI -= i_Damage;
+        m_AIHp -= i_Damage;
         AnimationManager.Instance.EnemyHurt();
     }
 
-    private void AttackCard(Card i_Attacker, Card i_Target)
+    public void AttackCard(Card i_Attacker, Card i_Target)
     {
         if (i_Target.LoseHp(i_Attacker.Attack))
         {
@@ -1006,7 +1087,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void ActivatePlayerAvatar()
+    public void ActivatePlayerAvatar()
     {
         m_PlayerAvatarActive = !m_PlayerAvatarActive;
         if (m_PlayerAvatarActive)
@@ -1021,7 +1102,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ShowNormalCards()
+    public void ShowNormalCards()
     {
         for (int i = 0; i < 7; i++)
         {
@@ -1061,11 +1142,11 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void UpdateTexts()
+    public void UpdateTexts()
     {
         m_PlayerHpText.text = m_PlayerHp.ToString();
         m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
-        m_HpAIText.text = m_HpAI.ToString();
+        m_HpAIText.text = m_AIHp.ToString();
         m_ManaAIText.text = m_AIMana.ToString() + "/" + m_AIMaxMana.ToString();
 
         if (m_BtnPowerDrawCard.activeSelf)
@@ -1114,7 +1195,7 @@ public class GameController : MonoBehaviour
         m_WaitForMulligan = false;
     }
 
-    private void ShowValidTiles(Card i_Card)
+    public void ShowValidTiles(Card i_Card)
     {
         if (i_Card.CardType == CardType.Component)
         {
@@ -1293,7 +1374,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ShowNormalTiles()
+    public void ShowNormalTiles()
     {
         for (int x = 0; x < m_Board.m_Tiles.Length; x++)
         {
@@ -1325,7 +1406,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void UpdateAIManaText()
+    public void UpdateAIManaText()
     {
         m_ManaAIText.text = m_AIMana.ToString() + "/" + m_AIMaxMana.ToString();
     }
@@ -1343,7 +1424,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void DrawCard()
+    public void DrawCard()
     {
         Vector3 temp = new Vector3();
         int indexLibre = System.Array.IndexOf(m_PlayerHand, null);
@@ -1384,7 +1465,7 @@ public class GameController : MonoBehaviour
         } 
     }
 
-    private void AIDrawCard()
+    public void AIDrawCard()
     {
         Vector3 temp = new Vector3();
 
@@ -1481,7 +1562,15 @@ public class GameController : MonoBehaviour
         deckTemp.GetComponent<Card>().ChangeState(Card.States.InDeck);
         deckTemp.GetComponent<Card>().m_Owner  = i_Player;
         deckTemp.name = m_CardTypes[i_Counter].m_CardTypeName;
-        deckTemp.GetComponent<Card>().InitCard(m_CardData);
+        if (i_Player == Card.Players.Player)
+        {
+            deckTemp.GetComponent<Card>().InitCard(m_CardData, m_PlayerGravePosition);
+        }
+        else
+        {
+            deckTemp.GetComponent<Card>().InitCard(m_CardData, m_AIGravePosition);
+        }
+        deckTemp.GetComponent<Card>().m_Game = this;
         if (!m_RandomDeck)
         {
             m_CardNumberByType[i_Counter] -=  1;
@@ -1489,7 +1578,7 @@ public class GameController : MonoBehaviour
         return deckTemp;
     }
 
-    private void CheckPlayableCard()
+    public void CheckPlayableCard()
     {
         for (int i = 0; i < 7; i++)
         {
@@ -1520,7 +1609,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ShuffleGraveInDeck()
+    public void ShuffleGraveInDeck()
     {   
         int i = 0;
         while (m_PlayerGrave[i] != null)
@@ -1654,7 +1743,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void GameEnd(bool i_PlayerWin)
+    public void GameEnd(bool i_PlayerWin)
     {
         m_ResultText.gameObject.SetActive(true);
         if (i_PlayerWin)
@@ -1668,7 +1757,7 @@ public class GameController : MonoBehaviour
 
     }
 
-    private void Zoom(bool i_StartZoom, Card i_CardToZoom = null)
+    public void Zoom(bool i_StartZoom, Card i_CardToZoom = null)
     {
         if (i_StartZoom)
         {
@@ -1688,7 +1777,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void SelectedCardAttackAIAvatar()
+    public void SelectedCardAttackAIAvatar()
     {
         ChangePlayerMana(-m_SelectedCard.ActivateCost);
         HurtEnemy(m_SelectedCard.Attack);
@@ -1697,7 +1786,7 @@ public class GameController : MonoBehaviour
         ShowNormalTiles();
     }
 
-    private void SelectedComponentAddToCard(Card i_CardOver)
+    public void SelectedComponentAddToCard(Card i_CardOver)
     {
         ChangePlayerMana(-m_SelectedCard.CastingCost);
         i_CardOver.AddComponentCard(m_SelectedCard);
@@ -1708,7 +1797,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void showButtonDiscard(bool i_Activate)
+    public void showButtonDiscard(bool i_Activate)
     {
         m_BtnDiscard.SetActive(i_Activate);
         Vector3 temp = m_SelectedCard.transform.position;
@@ -1718,7 +1807,7 @@ public class GameController : MonoBehaviour
         m_BtnDiscard.transform.position = temp;
     }
 
-    private void SelectedCardToInPlayState()
+    public void SelectedCardToInPlayState()
     {
         m_SelectedCard.ChangeState(Card.States.InPlay);
         m_PlayerHand[m_SelectedCard.m_Position] = null;
@@ -1726,7 +1815,7 @@ public class GameController : MonoBehaviour
         ChangePlayerMana(-m_SelectedCard.CastingCost);
     }
 
-    private void SelectedCardToBoard(TileController i_Tile)
+    public void SelectedCardToBoard(TileController i_Tile)
     {
         m_SelectedCard.m_TileOccupied = i_Tile;
         i_Tile.m_OccupiedBy = m_SelectedCard;
@@ -1735,7 +1824,7 @@ public class GameController : MonoBehaviour
         CheckPlayableCard();
     }
 
-    private void CastSpell(TileController i_Tile)
+    public void CastSpell(TileController i_Tile)
     {
         i_Tile.AddSpellEffects(m_SelectedCard);
         m_BtnDiscard.SetActive(false);

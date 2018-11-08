@@ -28,6 +28,7 @@ public class Card : MonoBehaviour
     public int m_Position;
 
     public TileController m_TileOccupied;
+    public GameController m_Game;
 
     #region Card Stats
     protected int m_CastCost = 1;
@@ -65,7 +66,9 @@ public class Card : MonoBehaviour
     public string m_CardName;
     public bool m_Playable = true;
     public bool m_ValidTarget = false;
-    
+    public float m_MoveTime = 1.5f;
+
+
     public Players m_Owner = Players.AI ;
     public TextMeshPro m_CostText;
     public TextMeshPro m_AttackText;
@@ -77,6 +80,7 @@ public class Card : MonoBehaviour
 
     protected States m_State = States.InDeck;
     protected Transform m_SpawnPoint;
+    protected Transform m_GravePosition;
     protected GameObject m_Character;
     protected Renderer m_Renderer;
     #region Getters
@@ -308,8 +312,13 @@ public class Card : MonoBehaviour
         GameController.ChangeTurn -= TurnTick;
     }
 
-    public void InitCard(CardsData i_CardData)
+    public void InitCard(CardsData i_CardData , Transform i_Grave = null)
     {
+        if (i_Grave)
+        {
+            m_GravePosition = i_Grave;
+        }
+        
         for (int i = 0; i < i_CardData.CardTemplates.Length; i++)
         {
             if (i_CardData.CardTemplates[i].CardName == m_CardName)
@@ -857,6 +866,10 @@ public class Card : MonoBehaviour
             {
                 DestroyCharacter();
             }
+            if (m_State == States.InGrave)
+            {
+                CardMove(m_GravePosition.position, m_GravePosition.rotation);
+            }
         }
     }
 
@@ -908,10 +921,6 @@ public class Card : MonoBehaviour
             Destroy(m_Character);
             m_Character = null;
         }
-        else
-        {
-            Debug.Log("This card do not have a character instance to destroy");
-        }
     }
 
     protected void AnimAttack()
@@ -938,6 +947,94 @@ public class Card : MonoBehaviour
         }
     }
 
+    public IEnumerator CardMove(Vector3 i_EndPos, Quaternion i_EndRot)
+    {
+        Vector3 startPos = transform.position;
+        Quaternion startRot = transform.rotation;
+        float currentTime = 0f;
+        AnimWalk();     
+
+        yield return new WaitForSeconds(0.2f);
+        float value;
+
+        LookFoward CharPos = null;
+
+        if (transform.GetComponentInChildren<LookFoward>())
+        {
+            CharPos = transform.GetComponentInChildren<LookFoward>();
+        }
+
+        while (currentTime != m_MoveTime)
+        {
+            currentTime += Time.deltaTime;
+            if (currentTime > m_MoveTime)
+            {
+                currentTime = m_MoveTime;
+            }
+
+            value = currentTime / m_MoveTime;
+            transform.position = Vector3.Lerp(startPos, i_EndPos, value);
+            transform.rotation = Quaternion.Slerp(startRot, i_EndRot, value);
+            if (CharPos != null)
+            {
+                CharPos.UpdatePos(transform.GetComponent<Card>().SpawnPoint.position);
+            }
+            yield return new WaitForEndOfFrame();
+        }
+
+        if (CharPos != null)
+        {
+            CharPos.UpdatePos(transform.GetComponent<Card>().SpawnPoint.position);
+        }
+        currentTime = 0f;
+
+        if (transform != null && transform.GetComponent<Card>())
+        {
+            transform.GetComponent<Card>().AnimIdle();
+        }
+    }
+
+    public void AttackCard(Card i_Target)
+    {
+        if (i_Target.LoseHp(m_Attack))
+        {
+            if (m_Game.TurnAI)
+            {
+                m_Game.AIMana -= m_ActivateCost;
+            }
+            else
+            {
+                m_Game.ChangePlayerMana(-m_ActivateCost);
+            }
+
+            if (i_Target.m_Owner == Card.Players.Player)
+            {
+                m_Game.PlayerGrave[System.Array.IndexOf(m_Game.PlayerGrave, null)] = i_Target.gameObject;
+            }
+            else
+            {
+                m_Game.AIGrave[System.Array.IndexOf(m_Game.AIGrave, null)] = i_Target.gameObject;
+                m_Game.SelectedCard = null;
+                m_Game.ShowNormalTiles();
+            }
+
+            i_Target.m_TileOccupied.ClearTile();
+            i_Target.m_TileOccupied = null;
+            i_Target.ChangeState(Card.States.InGrave);
+        }
+        else
+        {
+            if (m_Game.TurnAI)
+            {
+                m_Game.AIMana -= m_ActivateCost;
+            }
+            else
+            {
+                m_Game.ChangePlayerMana(-m_ActivateCost);
+            }
+        }
+    }
+
     protected void AnimDie()
     {
         if (m_Owner == Players.AI)
@@ -955,7 +1052,7 @@ public class Card : MonoBehaviour
         if (m_Character != null && m_Character.GetComponent<Animator>())
         {
             m_Character.GetComponent<Animator>().SetTrigger("Die");
-        }
+        }  
     }
 
     public void AnimWalk(Transform i_Target = null)

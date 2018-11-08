@@ -121,9 +121,11 @@
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\ApplicationLauncher\ApplicationLauncher.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\DeckCreation\CardRowScript.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\DeckCreation\DeckCreationController.cs" />
+    <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\AIController.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\Avatars.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\BoardGenerator.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\GameController.cs" />
+    <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\InputController.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\LookFoward.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\LookUp.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\TileController.cs" />
