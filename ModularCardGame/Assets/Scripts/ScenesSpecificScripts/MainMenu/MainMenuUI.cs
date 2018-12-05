@@ -20,26 +20,31 @@ public class MainMenuUI : MonoBehaviour
 
     public void StartGame()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         LevelManager.Instance.ChangeLevel("Game");
     }
 
     public void QuitGame()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         Application.Quit();
     }
 
     public void DeckCreation()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         LevelManager.Instance.ChangeLevel("DeckCreation");
     }
 
     public void ToggleAICheatMode()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         GameManager.Instance.ToggleCheatMode();
     }
 
     public void ToggleRandomDeck()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         GameManager.Instance.ToggleRandomDeck();
         if (m_RandomDeckSize != null)
         {
@@ -59,6 +64,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void SetRandomDeckSize()
     {
+        AudioManager.Instance.PlayMenuSelectSound();
         m_SizeText.text = m_RandomDeckSize.value.ToString();
         GameManager.Instance.RandomDeckSize((int)m_RandomDeckSize.value);
     }

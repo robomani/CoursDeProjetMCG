@@ -14,7 +14,7 @@ public class Attack : Card
     public override void AddComponentCard(Card i_Card)
     {
         base.AddComponentCard(i_Card);
-
+        /*
         if (i_Card.m_CardName == "Hp" || i_Card.m_CardName == "Movement")
         {
             m_Renderer.material.color = Color.black;
@@ -35,5 +35,6 @@ public class Attack : Card
                 m_PushRange++;
             }
         }
+        */
     }
 }

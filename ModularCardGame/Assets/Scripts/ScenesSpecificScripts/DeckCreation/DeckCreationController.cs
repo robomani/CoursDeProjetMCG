@@ -18,6 +18,7 @@ public class DeckCreationController : MonoBehaviour
     private GameObject m_BaseCard;
     private int m_BaseCardIndex = 0;
 
+    public TextMeshPro m_HabList;
 
     #region Buttons
     [Tooltip("Le bouton qui permet d'ajouter la composante de base a la carte en cours de construction")]
@@ -105,12 +106,10 @@ public class DeckCreationController : MonoBehaviour
         if (m_BaseCard.GetComponent<Card>().CardType == CardType.Component)
         {
             m_BtnAdd.SetActive(true);
-            m_BtnSubstract.SetActive(true);
         }
         else
         {
             m_BtnAdd.SetActive(false);
-            m_BtnSubstract.SetActive(false);
         }
     }
 
@@ -126,12 +125,10 @@ public class DeckCreationController : MonoBehaviour
         if (m_BaseCard.GetComponent<Card>().CardType == CardType.Component)
         {
             m_BtnAdd.SetActive(true);
-            m_BtnSubstract.SetActive(true);
         }
         else
         {
             m_BtnAdd.SetActive(false);
-            m_BtnSubstract.SetActive(false);
         }
     }
 
@@ -142,7 +139,11 @@ public class DeckCreationController : MonoBehaviour
             DestroyCard();
         }
         m_CurrentCard = Instantiate<GameObject>(m_BaseCard,m_CurrentCardPos.transform.position,m_PoolCardPosition.transform.rotation,m_PoolCardPosition);
+        m_CurrentCard.GetComponent<Card>().m_HabilityList = m_HabList;
         m_CurrentCard.GetComponent<Card>().CopyCard(m_BaseCard.GetComponent<Card>());
+        m_CurrentCard.transform.localScale = new Vector3(2,2,2);
+        m_CurrentCard.GetComponent<Card>().m_Visualisation = true;
+        m_CurrentCard.GetComponent<Card>().ChangeState(Card.States.InHand);
     }
 
     public void AddToCard()
@@ -224,6 +225,5 @@ public class DeckCreationController : MonoBehaviour
         m_BaseCard.transform.position = m_BaseCardPos.transform.position;
         
         m_BtnAdd.SetActive(false);
-        m_BtnSubstract.SetActive(false);
     }
 }

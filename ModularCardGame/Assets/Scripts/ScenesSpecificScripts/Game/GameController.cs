@@ -64,6 +64,7 @@ public class GameController : MonoBehaviour
     public int AIMaxMana
     {
         get { return m_AIMaxMana; }
+        set { m_AIMaxMana = value; }
     }
 
     [Tooltip("Le texte qui affiche le nombre de mana de l'IA")]
@@ -195,6 +196,7 @@ public class GameController : MonoBehaviour
     [Tooltip("Lien avec le script du Gameboard")]
     [SerializeField]
     private BoardGenerator m_Board;
+    public BoardGenerator Board { get { return m_Board; } }
 
     [SerializeField]
     private TextMeshPro m_ResultText;
@@ -224,6 +226,10 @@ public class GameController : MonoBehaviour
     }
 
     private GameObject[] m_AIHand;
+    public GameObject[] AIHand
+    {
+        get { return m_AIHand; }
+    }
     private GameObject[] m_AIDeck;
     private List<GameObject> m_AIInPlay = null;
     private GameObject[] m_AIGrave;
@@ -833,9 +839,10 @@ public class GameController : MonoBehaviour
     {
         if (m_TurnAI)
         {
-
+            m_TurnAI = false;
         }
-        else if (m_TurnOwner == Card.Players.Player)
+
+        if (m_TurnOwner == Card.Players.Player)
         {
             m_TurnOwner = Card.Players.AI;
             m_AIMana = m_AIMaxMana;
@@ -843,13 +850,13 @@ public class GameController : MonoBehaviour
             m_TurnAI = true;
             if (m_AICheatMode)
             {
-                //m_AIController.StartCoroutine(m_AIController.AICheatTurn());
+                m_AIController.AICheatTurn();          
             }
             else
             {
-                //m_AIController.StartCoroutine(m_AIController.AiTurn());
+                m_AIController.AITurn();
             }
-            
+
             if (ChangeTurn != null)
             {
                 ChangeTurn();
@@ -981,12 +988,6 @@ public class GameController : MonoBehaviour
             //TODO:: Start a coroutine that flash the mana counter of the player and the PowerDrawButon
         }
     }
-    /*
-    public void StopWaitingForMulligan()
-    {
-        m_WaitForMulligan = false;
-    }
-    */
 
     public void ShowValidTiles(Card i_Card = null)
     {
@@ -1316,7 +1317,7 @@ public class GameController : MonoBehaviour
         if (i_SelectedCard != null)
         {
             m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = i_SelectedCard.gameObject;
-            i_SelectedCard.StartCoroutine(i_SelectedCard.CardMove(m_PlayerGravePosition.position, m_PlayerGravePosition.rotation));
+            i_SelectedCard.MoveCard(m_PlayerGravePosition.position, m_PlayerGravePosition.rotation);
             i_SelectedCard.ChangeState(Card.States.InGrave);
             m_PlayerHand[i_SelectedCard.m_Position] = null;
             m_ZoomCard.SetActive(false);

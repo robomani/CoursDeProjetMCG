@@ -128,6 +128,7 @@
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\InputController.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\LookFoward.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\LookUp.cs" />
+    <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\SpecialPowersExplication.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\Game\TileController.cs" />
     <Compile Include="Assets\Scripts\ScenesSpecificScripts\MainMenu\MainMenuUI.cs" />
     <Compile Include="Assets\Scripts\ScriptableObjects\CardsData.cs" />

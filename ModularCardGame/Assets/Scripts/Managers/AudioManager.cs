@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum AttackType
+{
+    Sword,
+    Magic,
+    Arrow,
+}
+
 public class AudioManager : DontDestroyOnLoad
 {
     //Pour le singleton satic veut dire que l'on peut y acceder de partout
@@ -21,10 +28,31 @@ public class AudioManager : DontDestroyOnLoad
     private AudioSource m_AudioSourceMusic;
 
     [SerializeField]
+    private AudioSource m_AudioSourceEffects;
+
+    [SerializeField]
     private AudioClip[] m_MenuMusicList;
 
     [SerializeField]
     private AudioClip[] m_GameMusicList;
+
+    [SerializeField]
+    private AudioClip m_SwordAttackSound;
+
+    [SerializeField]
+    private AudioClip m_MagicAttackSound;
+
+    [SerializeField]
+    private AudioClip m_ArrowAttackSound;
+
+    [SerializeField]
+    private AudioClip m_DeathSound;
+
+    [SerializeField]
+    private AudioClip m_DestructionSound;
+
+    [SerializeField]
+    private AudioClip m_MenuSelectSound;
 
     private int m_GameSong = 0;
     private int m_MenuSong = 0;
@@ -123,12 +151,49 @@ public class AudioManager : DontDestroyOnLoad
         StartCoroutine(SwichMusicRoutine(i_Duration, nextClip));
     }
 
+    public void PlayMenuSelectSound()
+    {
+        m_AudioSourceEffects.clip = m_MenuSelectSound;
+        m_AudioSourceEffects.Play();
+    }
+
+    public void PlayDeathSound()
+    {
+        m_AudioSourceEffects.clip = m_DeathSound;
+        m_AudioSourceEffects.Play();
+    }
+
+    public void PlayDestructionSound()
+    {
+        m_AudioSourceEffects.clip = m_DestructionSound;
+        m_AudioSourceEffects.Play();
+    }
+
+    public void PlayAttackSound(AttackType i_Type)
+    {
+        switch (i_Type)
+        {
+            case AttackType.Sword:
+                m_AudioSourceEffects.clip = m_SwordAttackSound;
+                break;
+            case AttackType.Magic:
+                m_AudioSourceEffects.clip = m_MagicAttackSound;
+                break;
+            case AttackType.Arrow:
+                m_AudioSourceEffects.clip = m_ArrowAttackSound;
+                break;
+            default:
+                break;  
+        }
+        m_AudioSourceEffects.Play();
+    }
+
     public void PlayPingSound()
     {
 
     }
     /*
-    public void PlaySFX(AudioClip i_Clip, Vector3 i_Position)
+    private void PlaySFX(AudioClip i_Clip, Vector3 i_Position)
     {
         SFXAudio audio = Instantiate(m_SFXAudioPrefab, i_Position, Quaternion.identity);
         audio.Setup(i_Clip);

@@ -29,6 +29,7 @@ public class Card : MonoBehaviour
 
     public TileController m_TileOccupied;
     public GameController m_Game;
+    public bool m_Visualisation;
 
     #region Card Stats
     protected int m_CastCost = 1;
@@ -858,17 +859,20 @@ public class Card : MonoBehaviour
         if (i_State != m_State)
         {
             m_State = i_State;
-            if (m_State == States.InPlay)
+            if (!m_Visualisation)
             {
-                SpawnCharacter();
-            }
-            else
-            {
-                DestroyCharacter();
-            }
-            if (m_State == States.InGrave)
-            {
-                CardMove(m_GravePosition.position, m_GravePosition.rotation);
+                if (m_State == States.InPlay)
+                {
+                    SpawnCharacter();
+                }
+                else
+                {
+                    DestroyCharacter();
+                }
+                if (m_State == States.InGrave)
+                {
+                    CardMove(m_GravePosition.position, m_GravePosition.rotation);
+                }
             }
         }
     }
@@ -927,6 +931,18 @@ public class Card : MonoBehaviour
     {
         if (m_Character != null && m_Character.GetComponent<Animator>())
         {
+            if (GetComponent<Mage>())
+            {
+                AudioManager.Instance.PlayAttackSound(AttackType.Magic);
+            }
+            else if (GetComponent<Solder>())
+            {
+                AudioManager.Instance.PlayAttackSound(AttackType.Sword);
+            }
+            else if (GetComponent<Archer>())
+            {
+                AudioManager.Instance.PlayAttackSound(AttackType.Arrow);
+            }
             m_Character.GetComponent<Animator>().SetTrigger("Attack");
         }
     }
@@ -947,7 +963,25 @@ public class Card : MonoBehaviour
         }
     }
 
-    public IEnumerator CardMove(Vector3 i_EndPos, Quaternion i_EndRot)
+    public void MoveCard(Vector3 i_EndPos, Quaternion i_EndRot)
+    {
+        StartCoroutine(CardMove(i_EndPos, i_EndRot));
+    }
+
+    public void MoveAttack(Vector3 i_EndPos, Quaternion i_EndRot)
+    {
+        StartCoroutine(CardMoveAttack(i_EndPos, i_EndRot));
+    }
+
+    private IEnumerator CardMoveAttack(Vector3 i_EndPos, Quaternion i_EndRot)
+    {
+        Vector3 start = transform.position;
+        StartCoroutine(CardMove(i_EndPos, i_EndRot));
+        yield return new WaitForSeconds(2.0f);
+        StartCoroutine(CardMove(start, i_EndRot));
+    }
+
+    private IEnumerator CardMove(Vector3 i_EndPos, Quaternion i_EndRot)
     {
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
@@ -1035,6 +1069,15 @@ public class Card : MonoBehaviour
 
     protected void AnimDie()
     {
+        if (m_CardType == CardType.Building)
+        {
+            AudioManager.Instance.PlayDestructionSound();
+        }
+        else if (m_CardType == CardType.Creature)
+        {
+            AudioManager.Instance.PlayDeathSound();
+        }
+
         if (m_Owner == Players.AI)
         {
             if (m_CardType == CardType.Creature)

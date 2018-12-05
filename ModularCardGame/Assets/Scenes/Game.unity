@@ -1430,6 +1430,204 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
+--- !u!1 &291417211
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 291417212}
+  - component: {fileID: 291417216}
+  - component: {fileID: 291417215}
+  - component: {fileID: 291417214}
+  - component: {fileID: 291417213}
+  m_Layer: 0
+  m_Name: PowerExplanation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &291417212
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 291417211}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 7.18}
+  m_LocalScale: {x: 0.018424999, y: 0.018424999, z: 0.01842}
+  m_Children: []
+  m_Father: {fileID: 695925544}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.56, y: -6.8}
+  m_SizeDelta: {x: 20, y: 5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &291417213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 291417211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -806885394, guid: 89f0137620f6af44b9ba852b4190e64e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_text: Armor Reduce damage taken by the armor value on each attack
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: f76ef802b8b940c46a31f9027f2b0158, type: 2}
+  m_sharedMaterial: {fileID: 2140474, guid: f76ef802b8b940c46a31f9027f2b0158, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_outlineColor:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontSize: 100
+  m_fontSizeBase: 100
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_textAlignment: 257
+  m_isAlignmentEnumConverted: 1
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_firstOverflowCharacterIndex: -1
+  m_linkedTextComponent: {fileID: 0}
+  m_isLinkedTextComponent: 0
+  m_isTextTruncated: 0
+  m_enableKerning: 1
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 0
+  m_isCullingEnabled: 0
+  m_ignoreRectMaskCulling: 0
+  m_ignoreCulling: 1
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_firstVisibleCharacter: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: -149.07112, y: 0, z: 67.34599, w: -75.0941}
+  m_textInfo:
+    textComponent: {fileID: 291417213}
+    characterCount: 59
+    spriteCount: 0
+    spaceCount: 10
+    wordCount: 11
+    linkCount: 0
+    lineCount: 3
+    pageCount: 1
+    materialCount: 1
+  m_havePropertiesChanged: 0
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_spriteAnimator: {fileID: 0}
+  m_isInputParsingRequired: 0
+  m_inputSource: 0
+  m_hasFontAssetChanged: 0
+  m_renderer: {fileID: 291417215}
+  m_subTextObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  m_maskType: 0
+--- !u!222 &291417214
+CanvasRenderer:
+  m_ObjectHideFlags: 2
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 291417211}
+--- !u!23 &291417215
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 291417211}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
+  m_Materials:
+  - {fileID: 2140474, guid: f76ef802b8b940c46a31f9027f2b0158, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &291417216
+MeshFilter:
+  m_ObjectHideFlags: 2
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 291417211}
+  m_Mesh: {fileID: 0}
 --- !u!1 &301438159 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1744303577731036, guid: 8edf6afd47eea964dadb19d3479a410b,
@@ -2094,7 +2292,7 @@ MonoBehaviour:
     m_CardTypeSkin: {fileID: 2100000, guid: 357f3830be97f30419eea1a5c9a7f787, type: 2}
     m_ScriptToAttach: Archer
   - m_CardTypeName: BaseSpell
-    m_NbrInDeck: 5
+    m_NbrInDeck: 0
     m_CardTypeSkin: {fileID: 2100000, guid: 6d54f4856bd4d37489a624d7d408e56f, type: 2}
     m_ScriptToAttach: BaseSpell
   - m_CardTypeName: Forge
@@ -2122,11 +2320,11 @@ MonoBehaviour:
     m_CardTypeSkin: {fileID: 2100000, guid: 2c03f9616b7fa8f4e833c0e1ba9185f0, type: 2}
     m_ScriptToAttach: Movement
   - m_CardTypeName: Push
-    m_NbrInDeck: 3
+    m_NbrInDeck: 0
     m_CardTypeSkin: {fileID: 2100000, guid: 3c26f67f953a5304e86632e2fb63c649, type: 2}
     m_ScriptToAttach: Push
   - m_CardTypeName: Trade
-    m_NbrInDeck: 3
+    m_NbrInDeck: 0
     m_CardTypeSkin: {fileID: 2100000, guid: 557ea26aed8083c4eab172e9d21b4fd5, type: 2}
     m_ScriptToAttach: Trade
   - m_CardTypeName: Armor
@@ -2148,7 +2346,7 @@ MonoBehaviour:
   m_IsCheating: 0
   m_MainCamera: {fileID: 1677651148}
   m_ZoomCamera: {fileID: 881193882}
-  m_AIController: {fileID: 0}
+  m_AIController: {fileID: 1054864074}
 --- !u!4 &487679857
 Transform:
   m_ObjectHideFlags: 0
@@ -2812,6 +3010,7 @@ Transform:
   - {fileID: 151904361}
   - {fileID: 1189162637}
   - {fileID: 439484856}
+  - {fileID: 291417212}
   m_Father: {fileID: 1208166640}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3789,6 +3988,47 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1032072218}
+--- !u!1 &1054864073
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1054864075}
+  - component: {fileID: 1054864074}
+  m_Layer: 0
+  m_Name: AIController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1054864074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1054864073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f06e7853d6c2d7c43a261dad4e8f2808, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Game: {fileID: 487679856}
+--- !u!4 &1054864075
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1054864073}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.4439716, y: 0.4049449, z: 8.95517}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1068506338
 GameObject:
   m_ObjectHideFlags: 0
@@ -4181,6 +4421,7 @@ GameObject:
   - component: {fileID: 1189162640}
   - component: {fileID: 1189162639}
   - component: {fileID: 1189162638}
+  - component: {fileID: 1189162641}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -4264,6 +4505,59 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1189162641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1189162636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afeb2865faf9c7d43adce9bb52fb1fcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TextZone: {fileID: 291417213}
+  m_Desc:
+  - m_Name: Armor
+    m_Desc: Reduce damage from each incomming attack by this value
+  - m_Name: Armor Alfter Getting Pushed
+    m_Desc: Add value in armor for 1 turn to the card after geting pushed
+  - m_Name: Armor Alfter Move
+    m_Desc: Add value in armor for 1 turn to the card after moving
+  - m_Name: Armor Alfter Trade
+    m_Desc: Add value in armor for 1 turn to the card after geting teleported
+  - m_Name: Armor Percing
+    m_Desc: Reduce the armor value of the target by this value for this attack
+  - m_Name: Indirect Attack
+    m_Desc: Can attack over another card if in range
+  - m_Name: Lateral Push
+    m_Desc: Can move the target lateraly by this value if it would be pushed
+  - m_Name: Move Alfter Push
+    m_Desc: Can folow a target getting pushed by this card up to this value in the
+      same activation than the attack
+  - m_Name: Move Alfter Trade
+    m_Desc: Can move by this value alfter initiating a succesful trade
+  - m_Name: Number Of Spell To Ignore
+    m_Desc: Ignore the first X spells that would affect this card (Friendly or not)
+  - m_Name: Push Range
+    m_Desc: Push the target of an attack by this card by this many tiles if able
+  - m_Name: Push Resist
+    m_Desc: Reduce the number of tile geting pushed by this value
+  - m_Name: Shadow Alfter Getting Pushed
+    m_Desc: Add value in shadow for 1 turn to the card after geting pushed
+  - m_Name: Shadow Alfter Push
+    m_Desc: Add value in shadow for 1 turn to the tiles the target exit from the push
+  - m_Name: Shadow Alfter Trade
+    m_Desc: Add value in shadow for 1 turn to the card after geting teleported
+  - m_Name: Shadow On life lost
+    m_Desc: Add value in shadow for 1 turn to the card after geting damaged
+  - m_Name: Shadow Sight Range
+    m_Desc: Can see the content of tiles with ennemy shadow in this value in range
+  - m_Name: Shadow Teleport Range
+    m_Desc: Can teleport to a tile in range that has friendly shadow and is empty
+  - m_Name: Shadow Time
+    m_Desc: Add a shadow effect for the ennemy that last this value in turn or until
+      an ennemy enter the tile
 --- !u!1 &1198200945
 GameObject:
   m_ObjectHideFlags: 0
@@ -5859,7 +6153,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1189162641}
+        m_MethodName: Selecting
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: TMPro.TMP_Dropdown+DropdownEvent, TextMeshPro-2017.3-Runtime, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1519992124

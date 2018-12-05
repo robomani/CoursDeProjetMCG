@@ -27,7 +27,7 @@ public class InputController : MonoBehaviour
     {
         if (Input.GetButtonDown("Options"))
         {
-
+            GameManager.Instance.TriggerOptionScreen();
         }
 
         if (!m_GameEnded)
@@ -155,7 +155,7 @@ public class InputController : MonoBehaviour
                         {
                             TileHitInfo.transform.GetComponent<TileController>().SetShadow(m_SelectedCard.ShadowTime, m_SelectedCard.m_Owner);
                         }
-                        m_SelectedCard.StartCoroutine(m_SelectedCard.CardMove(m_TempPosition, m_Game.PlayerTileRotation.rotation));
+                        m_SelectedCard.MoveCard(m_TempPosition, m_Game.PlayerTileRotation.rotation);
                         if (m_SelectedCard.State == Card.States.InHand)
                         {
                             if (m_SelectedCard.CardType == CardType.Spell)
@@ -166,6 +166,7 @@ public class InputController : MonoBehaviour
                             {
                                 m_Game.SelectedCardToInPlayState(m_SelectedCard);
                             }
+                            
                         }
                         else
                         {
@@ -176,6 +177,7 @@ public class InputController : MonoBehaviour
                         {
                             m_Game.SelectedCardToBoard(TileHitInfo.transform.GetComponent<TileController>(), m_SelectedCard);
                         }
+                        m_SelectedCard = null;
                     }
 
                     if (Input.GetButtonDown("Select") && Physics.Raycast(m_RayPlayerHand, out TileHitInfo, 1000f, LayerMask.GetMask("Avatar Player")) && m_Game.PlayerMana > 0)
@@ -235,6 +237,7 @@ public class InputController : MonoBehaviour
             }
 #endif
         }
+        
     }
 
 }

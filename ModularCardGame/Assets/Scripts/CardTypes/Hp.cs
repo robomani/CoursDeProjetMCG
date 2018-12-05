@@ -13,7 +13,7 @@ public class Hp : Card
     public override void AddComponentCard(Card i_Card)
     {
         base.AddComponentCard(i_Card);
-
+        /*
         if (i_Card.m_CardName == "Movement" || i_Card.m_CardName == "Attack")
         {
             m_Renderer.material.color = Color.black;
@@ -34,5 +34,6 @@ public class Hp : Card
                 m_Armor++;
             }
         }
+        */
     }
 }

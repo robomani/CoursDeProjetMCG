@@ -12,9 +12,42 @@ public class GameManager : MonoBehaviour
     }
 
     public Action m_OnChangeScene;
+    public GameObject m_OptionScreen;
     private bool m_AICheatMode;
     private bool m_RandomDeck;
     private int m_RandomDeckSize = 0;
+
+    public void TriggerOptionScreen(bool? i_State = null)
+    {
+        if (i_State == null)
+        {
+            m_OptionScreen.SetActive(!m_OptionScreen.activeSelf);
+        }
+        else
+        {
+            m_OptionScreen.SetActive((bool)i_State);
+        }
+    }
+
+    public void RestartGame()
+    {
+        LevelManager.Instance.ChangeLevel("MainMenu", 0f);
+        LevelManager.Instance.ChangeLevel("Game", 0f);
+        TriggerOptionScreen(false);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        AudioManager.Instance.PlayMenuSelectSound();
+        LevelManager.Instance.ChangeLevel("MainMenu", 0f);
+        TriggerOptionScreen(false);
+    }
+
+    public void QuitGame()
+    {
+        AudioManager.Instance.PlayMenuSelectSound();
+        Application.Quit();
+    }
 
     public int m_AICreaturesInPlay { get; private set; }
     public void AddOrRemoveCreatureToAI(bool i_Add)
