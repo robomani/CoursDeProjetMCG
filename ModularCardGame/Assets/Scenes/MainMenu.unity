@@ -861,6 +861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RandomDeckSize: {fileID: 805789425}
+  m_RandomToggle: {fileID: 731015877}
   m_SizeText: {fileID: 402137920}
 --- !u!114 &868741955
 MonoBehaviour:

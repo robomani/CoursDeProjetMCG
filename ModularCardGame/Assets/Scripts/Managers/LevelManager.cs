@@ -54,7 +54,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void ChangeLevel(string i_Scene, float m_Time = 1.5f)
+    public void ChangeLevel(string i_Scene, float m_Time = 0f)
     {
         m_WaitTimeReady = false;
         m_LoadingReady = false;

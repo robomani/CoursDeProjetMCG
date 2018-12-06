@@ -286,9 +286,8 @@ public class GameController : MonoBehaviour
         AudioManager.Instance.GameStart();
         int nbrCardToAdd = Initialise();
 
-        m_RandomDeck = !GameManager.Instance.ToggleRandomDeck();
+        m_RandomDeck = !GameManager.Instance.GetIfRandomDeck();
         m_RandomDeckSize = GameManager.Instance.RandomDeckSize();
-        m_AICheatMode = !GameManager.Instance.ToggleCheatMode();
 
         m_BtnGainMaxMana.SetActive(true);
         m_BtnPowerDrawCard.SetActive(true);

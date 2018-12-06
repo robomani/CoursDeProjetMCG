@@ -7,14 +7,28 @@ using UnityEngine.UI;
 public class MainMenuUI : MonoBehaviour
 {
     public Slider m_RandomDeckSize;
+    public Toggle m_RandomToggle;
     public TextMeshProUGUI m_SizeText;
 
     private bool m_RandomDeck;
 
     private void Start()
     {
-        m_RandomDeckSize.gameObject.SetActive(false);
-        m_SizeText.enabled = false;
+        if (GameManager.Instance.GetIfRandomDeck())
+        {
+            m_RandomToggle.isOn = true;
+            m_RandomDeckSize.gameObject.SetActive(true);
+            m_SizeText.enabled = true;
+            GameManager.Instance.ToggleRandomDeck();
+        }
+        else
+        {
+            m_RandomToggle.isOn = false;
+            m_RandomDeckSize.gameObject.SetActive(false);
+            m_SizeText.enabled = false;
+        }
+        m_RandomDeckSize.value = GameManager.Instance.RandomDeckSize();
+
         AudioManager.Instance.MenuStart();
     }
 
@@ -39,7 +53,6 @@ public class MainMenuUI : MonoBehaviour
     public void ToggleAICheatMode()
     {
         AudioManager.Instance.PlayMenuSelectSound();
-        GameManager.Instance.ToggleCheatMode();
     }
 
     public void ToggleRandomDeck()

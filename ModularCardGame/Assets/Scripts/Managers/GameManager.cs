@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public GameObject m_OptionScreen;
     private bool m_AICheatMode;
     private bool m_RandomDeck;
-    private int m_RandomDeckSize = 0;
+    private int m_RandomDeckSize = 25;
 
     public void TriggerOptionScreen(bool? i_State = null)
     {
@@ -88,21 +88,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool ToggleCheatMode()
-    {
-        m_AICheatMode = !m_AICheatMode;
-        return m_AICheatMode;
-    }
-
     public bool ToggleRandomDeck()
     {
         m_RandomDeck = !m_RandomDeck;
         return m_RandomDeck;
     }
 
+    public bool GetIfRandomDeck()
+    {
+        return m_RandomDeck;
+    }
+
     public int RandomDeckSize(int i_Size = -1)
     {
-        if (i_Size > 14)
+        if (i_Size == -1)
+        {
+
+        }
+        else if (i_Size > 14)
         {
             m_RandomDeckSize = i_Size;
         }
