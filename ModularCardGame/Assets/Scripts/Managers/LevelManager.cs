@@ -30,13 +30,7 @@ public class LevelManager : MonoBehaviour
             m_Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        //m_LoadingScreen.SetActive(false);
-    }
 
-    private void StartLoading()
-    {
-        //m_LoadingScreen.SetActive(true);
-        //Play Animation
     }
 
     private void OnLoadingDone(Scene i_Scene, LoadSceneMode i_Mode)
@@ -46,7 +40,6 @@ public class LevelManager : MonoBehaviour
 
         if (m_WaitTimeReady)
         {
-            //m_LoadingScreen.SetActive(false);
         }
         else
         {
@@ -58,7 +51,6 @@ public class LevelManager : MonoBehaviour
     {
         m_WaitTimeReady = false;
         m_LoadingReady = false;
-        StartLoading();
         if (m_OnChangeScene != null)
         {
             m_OnChangeScene();
@@ -76,9 +68,5 @@ public class LevelManager : MonoBehaviour
         }
         yield return new WaitForSeconds(i_Time);
         m_WaitTimeReady = true;
-        if (m_LoadingReady)
-        {
-            //m_LoadingScreen.SetActive(false);
-        }
     }
 }

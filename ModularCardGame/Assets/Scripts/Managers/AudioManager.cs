@@ -192,14 +192,6 @@ public class AudioManager : DontDestroyOnLoad
     {
 
     }
-    /*
-    private void PlaySFX(AudioClip i_Clip, Vector3 i_Position)
-    {
-        SFXAudio audio = Instantiate(m_SFXAudioPrefab, i_Position, Quaternion.identity);
-        audio.Setup(i_Clip);
-        audio.Play();
-    }
-    */
 }
 
 

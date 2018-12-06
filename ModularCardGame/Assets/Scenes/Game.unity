@@ -2344,6 +2344,7 @@ MonoBehaviour:
   m_AltarAI: {fileID: 1760387926}
   m_AltarPlayer: {fileID: 1509246817}
   m_IsCheating: 0
+  GameEnded: 0
   m_MainCamera: {fileID: 1677651148}
   m_ZoomCamera: {fileID: 881193882}
   m_AIController: {fileID: 1054864074}
@@ -2914,8 +2915,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 487679856}
-        m_MethodName: DiscardCard
+      - m_Target: {fileID: 994904354}
+        m_MethodName: DiscardSelectedCard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3028,6 +3029,7 @@ MonoBehaviour:
   m_Position: 0
   m_TileOccupied: {fileID: 0}
   m_Game: {fileID: 0}
+  m_Visualisation: 0
   m_CardName: 
   m_Playable: 1
   m_ValidTarget: 0
@@ -5353,6 +5355,16 @@ Prefab:
     - target: {fileID: 4408392077079994, guid: 39de29ee986ba0749abc188388beff94, type: 2}
       propertyPath: m_RootOrder
       value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 114739136010438350, guid: 39de29ee986ba0749abc188388beff94,
+        type: 2}
+      propertyPath: PosY
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114739136010438350, guid: 39de29ee986ba0749abc188388beff94,
+        type: 2}
+      propertyPath: PosX
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39de29ee986ba0749abc188388beff94, type: 2}

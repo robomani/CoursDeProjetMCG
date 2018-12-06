@@ -36,11 +36,13 @@ public class Card : MonoBehaviour
     protected int m_CastRange = 1;
     protected int m_ActivateCost = 1;
     protected int m_Attack = 1;
-    protected int m_AttackRange = 1;
+    //-------------------------------------------------------
+    public int m_AttackRange = 1;
     protected int m_ArmorPercing;
     protected int m_Hp = 1;
     protected int m_ShadowOnLifeLost;
-    protected int m_Mouvement = 0;
+    //-------------------------------------------------------
+    public int m_Mouvement = 0;
     protected int m_ArmorAlfterMove;
     protected int m_Armor;
     protected int m_NumberOfSpellToIgnore;
@@ -60,7 +62,8 @@ public class Card : MonoBehaviour
     protected int m_ShadowTime;
     protected int m_ShadowTeleportRange;
     protected int m_ShadowSightRange;
-    protected bool m_IndirectAttack;
+    //-------------------------------------------------------
+    public bool m_IndirectAttack;
     protected CardType m_CardType;
     #endregion
 
@@ -1088,6 +1091,11 @@ public class Card : MonoBehaviour
             {
                 GameManager.Instance.AddOrRemoveBuildingToAI(false);
             }
+            MoveCard(m_Game.AIGravePosition.position, m_Game.AIGravePosition.rotation);
+        }
+        else
+        {
+            MoveCard(m_Game.PlayerGravePosition.position, m_Game.PlayerGravePosition.rotation);
         }
 
         if (m_Character != null && m_Character.GetComponent<Animator>())

@@ -30,6 +30,7 @@ public class InputController : MonoBehaviour
             GameManager.Instance.TriggerOptionScreen();
         }
 
+        m_GameEnded = m_Game.GameEnded;
         if (!m_GameEnded)
         {
             if (m_Game.PlayerHp <= 0 || m_Game.HpAI <= 0)
@@ -58,6 +59,7 @@ public class InputController : MonoBehaviour
                         if (Input.GetButtonDown("Select") && TileHitInfo.transform.GetComponentInParent<TileController>().m_IsValidTarget && m_SelectedCard != null)
                         {
                             m_Game.SelectedCardAttackAIAvatar(m_SelectedCard);
+                            m_SelectedCard = null;
                         }
                     }
                     else if (Physics.Raycast(m_RayPlayerHand, out HitInfo, 1000f, LayerMask.GetMask("Card")))
@@ -240,4 +242,12 @@ public class InputController : MonoBehaviour
         
     }
 
+    public void DiscardSelectedCard()
+    {
+        m_Game.DiscardCard(m_SelectedCard);
+        m_SelectedCard = null;
+    }
+
 }
+
+

@@ -75,6 +75,10 @@ public class TileController : MonoBehaviour
         m_IsValid = false;
         m_IsValidTarget = false;
         m_AttackRangeVisual.SetActive(false);
+        if (m_OccupiedBy)
+        {
+            m_OccupiedBy.UnIlluminate();
+        }
         if (m_Avatar != null)
         {
             m_Avatar.GetComponent<Renderer>().material.SetColor("_Color", m_AvatarColor);
@@ -85,6 +89,10 @@ public class TileController : MonoBehaviour
     {
         m_AttackRangeVisual.SetActive(true);
         m_IsValidTarget = true;
+        if (m_OccupiedBy)
+        {
+            m_OccupiedBy.ValidTarget();
+        }
         if (m_Avatar != null)
         {
             m_Avatar.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
