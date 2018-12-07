@@ -813,7 +813,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -917,6 +917,7 @@ MonoBehaviour:
   m_SwordAttackSound: {fileID: 8300000, guid: 5d7721ecaa30f68459ffe7f6cd107de6, type: 3}
   m_MagicAttackSound: {fileID: 8300000, guid: d7a2e7df93829f34f9dbcc69d38eba90, type: 3}
   m_ArrowAttackSound: {fileID: 8300000, guid: 5b9ae90eea0f8b74981da17dbebb97d9, type: 3}
+  m_AvatarActionSound: {fileID: 8300000, guid: 33f9ea4a648571748b833436f9001774, type: 3}
   m_DeathSound: {fileID: 8300000, guid: 0a964fd87f1f7e541978052d29bcc078, type: 3}
   m_DestructionSound: {fileID: 8300000, guid: e9438a9226f5335419fcb4cf03d68d8d, type: 3}
   m_MenuSelectSound: {fileID: 8300000, guid: fa038f3fbacf5544798015ca750c78e2, type: 3}

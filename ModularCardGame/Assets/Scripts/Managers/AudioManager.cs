@@ -46,6 +46,9 @@ public class AudioManager : DontDestroyOnLoad
     private AudioClip m_ArrowAttackSound;
 
     [SerializeField]
+    private AudioClip m_AvatarActionSound;
+
+    [SerializeField]
     private AudioClip m_DeathSound;
 
     [SerializeField]
@@ -116,6 +119,7 @@ public class AudioManager : DontDestroyOnLoad
         m_Menu = false;
         m_TimeToSwich = m_GameMusicList[m_GameSong].length;
         m_AudioSourceMusic.clip = m_GameMusicList[m_GameSong];
+        m_AudioSourceMusic.time = 3.0f;
         m_AudioSourceMusic.Play();
     }
 
@@ -124,6 +128,7 @@ public class AudioManager : DontDestroyOnLoad
         m_Menu = true;
         m_TimeToSwich = m_MenuMusicList[m_MenuSong].length;
         m_AudioSourceMusic.clip = m_MenuMusicList[m_MenuSong];
+        m_AudioSourceMusic.time = 6.0f;
         m_AudioSourceMusic.Play();
     }
 
@@ -185,6 +190,12 @@ public class AudioManager : DontDestroyOnLoad
             default:
                 break;  
         }
+        m_AudioSourceEffects.Play();
+    }
+
+    public void AvatarSound()
+    {
+        m_AudioSourceEffects.clip = m_AvatarActionSound;
         m_AudioSourceEffects.Play();
     }
 

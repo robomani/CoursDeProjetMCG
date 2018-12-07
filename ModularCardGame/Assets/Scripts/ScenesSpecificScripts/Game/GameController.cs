@@ -486,6 +486,7 @@ public class GameController : MonoBehaviour
         {
             if (m_PlayerHand.Count(s => s == null) > 0)
             {
+                AudioManager.Instance.AvatarSound();
                 Cast(m_PlayerHand.Count(s => s != null));
                 DrawCard();
                 ActivatePlayerAvatar();
@@ -768,7 +769,7 @@ public class GameController : MonoBehaviour
             m_PlayerMaxMana++;
             m_PlayerManaText.text = m_PlayerMana.ToString() + "/" + m_PlayerMaxMana.ToString();
         }
-        
+        AudioManager.Instance.AvatarSound();
         CheckPlayableCard();
     }
 
@@ -1164,6 +1165,7 @@ public class GameController : MonoBehaviour
 
     public void SelectedCardToBoard(TileController i_Tile, Card i_SelectedCard)
     {
+        AudioManager.Instance.AvatarSound();
         i_SelectedCard.m_TileOccupied = i_Tile;
         i_Tile.m_OccupiedBy = i_SelectedCard;
         m_BtnDiscard.SetActive(false);
@@ -1173,6 +1175,7 @@ public class GameController : MonoBehaviour
 
     public void CastSpell(TileController i_Tile, Card i_SelectedCard)
     {
+        AudioManager.Instance.AvatarSound();
         i_Tile.AddSpellEffects(i_SelectedCard);
         m_BtnDiscard.SetActive(false);
         DiscardCard(i_SelectedCard);
