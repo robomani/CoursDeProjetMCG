@@ -37,7 +37,7 @@ public class AIController : MonoBehaviour
         }
         
         yield return new WaitForSeconds(0.5f);
-        m_Game.AIMana -= i_AiCard.ActivateCost;
+        
     }
 
     private IEnumerator AICheat()
@@ -176,7 +176,7 @@ public class AIController : MonoBehaviour
 
             }
         }
-        //m_Game.TurnAI = false;
+        yield return new WaitForSeconds(0.5f);
         EndTurn();
     }
 
@@ -432,6 +432,7 @@ public class AIController : MonoBehaviour
             }
             turnTry++;
         }
+        yield return new WaitForSeconds(2.5f);
         EndTurn();
     }   
  

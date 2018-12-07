@@ -154,11 +154,11 @@
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Examples &amp; Extras\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\AssetStore+Standard assets\UETools\Magic_Particle_Effects\Readme.txt" />
     <None Include="Assets\AssetStore+Standard assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
-    <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>D:/Users/1810078/Desktop/CoursDeProjetMCG/ModularCardGame/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>D:/Users/1810078/Desktop/CoursDeProjetMCG/ModularCardGame/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>D:/Users/1810078/Desktop/AlexandreMaillyLegareGold/CoursDeProjetMCG/ModularCardGame/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.StandardEvents">
+      <HintPath>D:/Users/1810078/Desktop/AlexandreMaillyLegareGold/CoursDeProjetMCG/ModularCardGame/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity2018.1.6/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -359,10 +359,10 @@
       <HintPath>C:/Program Files/Unity2018.1.6/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="TextMeshPro-2017.3-Editor">
-      <HintPath>D:/Users/1810078/Desktop/CoursDeProjetMCG/ModularCardGame/Assets/AssetStore+Standard assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Editor.dll</HintPath>
+      <HintPath>D:/Users/1810078/Desktop/AlexandreMaillyLegareGold/CoursDeProjetMCG/ModularCardGame/Assets/AssetStore+Standard assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Editor.dll</HintPath>
     </Reference>
     <Reference Include="TextMeshPro-2017.3-Runtime">
-      <HintPath>D:/Users/1810078/Desktop/CoursDeProjetMCG/ModularCardGame/Assets/AssetStore+Standard assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Runtime.dll</HintPath>
+      <HintPath>D:/Users/1810078/Desktop/AlexandreMaillyLegareGold/CoursDeProjetMCG/ModularCardGame/Assets/AssetStore+Standard assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Runtime.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
       <HintPath>D:/Users/1810078/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>

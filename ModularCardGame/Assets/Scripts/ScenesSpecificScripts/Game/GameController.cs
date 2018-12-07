@@ -263,14 +263,30 @@ public class GameController : MonoBehaviour
     public int PlayerMana
     {
         get { return m_PlayerMana; }
-        set { m_PlayerMana = value; UpdateTexts(); }
+        set
+        {
+            m_PlayerMana = value;
+            if (m_PlayerMana < 0)
+            {
+                m_PlayerMana = 0;
+            }
+            UpdateTexts();
+        }
     }
 
     private int m_AIMana = 1;
     public int AIMana
     {
         get { return m_AIMana; }
-        set { m_AIMana = value;  UpdateTexts(); }
+        set
+        {
+            m_AIMana = value;
+            if (m_AIMana < 0)
+            {
+                m_AIMana = 0;
+            }
+            UpdateTexts();
+        }
     }
 
     private bool m_TurnAI = false;
@@ -403,18 +419,22 @@ public class GameController : MonoBehaviour
             if (ChangeTurn != null)
             {
                 ChangeTurn();
-            }  
+            }
+            m_PlayerMana = m_PlayerMaxMana;
         }
     }
 
     public void ChangePlayerMana(int i_Change)
     {
-        if (i_Change < 0)
+        if (m_TurnOwner == Card.Players.Player)
         {
-            AnimationManager.Instance.PlayerCast();
-        }
-        m_PlayerMana += i_Change;
-        CheckPlayableCard();
+            if (i_Change < 0)
+            {
+                AnimationManager.Instance.PlayerCast();
+            }
+            m_PlayerMana += i_Change;
+            CheckPlayableCard();
+        } 
     }
 
     public void ActivatePlayerAvatar()
@@ -873,10 +893,13 @@ public class GameController : MonoBehaviour
         {
             m_PlayerGrave[System.Array.IndexOf(m_PlayerGrave, null)] = i_SelectedCard.gameObject;
             i_SelectedCard.MoveCard(m_PlayerGravePosition.position, m_PlayerGravePosition.rotation);
+            if (i_SelectedCard.State == Card.States.InHand)
+            {
+                m_PlayerHand[i_SelectedCard.m_Position] = null;
+                ChangePlayerMana(-i_SelectedCard.CastingCost);
+                DrawCard();
+            }
             i_SelectedCard.ChangeState(Card.States.InGrave);
-            m_PlayerHand[i_SelectedCard.m_Position] = null;
-            ChangePlayerMana(-i_SelectedCard.CastingCost);
-            DrawCard();
             ShowNormalTiles(i_SelectedCard);
         }
         CheckPlayableCard();
@@ -1013,9 +1036,6 @@ public class GameController : MonoBehaviour
             {
                 case 0:
                     cardToAdd = 0;
-                    break;
-                case 1:
-                    cardToAdd = 5;
                     break;
                 case 2:
                     cardToAdd = 7;
