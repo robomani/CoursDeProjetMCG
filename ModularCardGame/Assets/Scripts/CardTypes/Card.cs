@@ -36,13 +36,11 @@ public class Card : MonoBehaviour
     protected int m_CastRange = 1;
     protected int m_ActivateCost = 1;
     protected int m_Attack = 1;
-    //-------------------------------------------------------
-    public int m_AttackRange = 1;
+    protected int m_AttackRange = 1;
     protected int m_ArmorPercing;
     protected int m_Hp = 1;
     protected int m_ShadowOnLifeLost;
-    //-------------------------------------------------------
-    public int m_Mouvement = 0;
+    protected int m_Mouvement = 0;
     protected int m_ArmorAlfterMove;
     protected int m_Armor;
     protected int m_NumberOfSpellToIgnore;
@@ -62,8 +60,7 @@ public class Card : MonoBehaviour
     protected int m_ShadowTime;
     protected int m_ShadowTeleportRange;
     protected int m_ShadowSightRange;
-    //-------------------------------------------------------
-    public bool m_IndirectAttack;
+    protected bool m_IndirectAttack;
     protected CardType m_CardType;
     #endregion
 
